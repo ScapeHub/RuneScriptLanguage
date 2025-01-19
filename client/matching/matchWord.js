@@ -1,53 +1,93 @@
 const matchType = require('./matchType');
 const { getWords, getWordAtIndex } = require('../utils/matchUtils');
-const regexWordMatcher = require('./matchers/regexWordMatcher');
-const commandMatcher = require('./matchers/commandMatcher');
-const localVarMatcher = require('./matchers/localVarMatcher');
-const prevCharMatcher = require('./matchers/prevCharMatcher');
-const triggerMatcher = require('./matchers/triggerMatcher');
-const configMatcher = require('./matchers/configMatcher');
-const parametersMatcher = require('./matchers/parametersMatcher');
 
-async function matchWordFromDocument(document, position) {
-  return matchWord(document.lineAt(position.line).text, position.character, document.uri);
+// Do not reorder the matchers unless there is a reason to 
+// quicker potential matches are processed earlier in order to short circuit faster
+const matchers = [
+  require('./matchers/regexWordMatcher'),
+  require('./matchers/commandMatcher'),
+  require('./matchers/localVarMatcher'),
+  require('./matchers/prevCharMatcher'),
+  require('./matchers/triggerMatcher'),
+  require('./matchers/configMatcher'),
+  require('./matchers/parametersMatcher')
+];
+
+/**
+ * Match with one word given a vscode document and a vscode position
+ */
+function matchWordFromDocument(document, position) {
+  return matchWord(document.lineAt(position.line).text, document.uri, position.character);
 }
 
-async function matchWord(lineText, index, uri) {
-  if (!lineText || !index || !uri) {
-    return null;
+/**
+ * Match with one word given a line of text and an index position
+ */
+function matchWord(lineText, uri, index) {
+  if (!lineText || !uri || !index) {
+    return undefined;
   }
+  const context = getBaseContext(lineText, uri);
+  const word = getWordAtIndex(context.words, index);
+  const wordContext = {
+    ...context,
+    word: word,
+    index: index,
+    prevWord: (word.index === 0) ? undefined : context.words[word.index - 1],
+    prevChar: lineText.charAt(word.start - 1),
+    nextChar: lineText.charAt(word.end + 1),
+  }
+  return match(wordContext);
+}
 
+/**
+ * Match with all words given a line of text
+ */
+function matchWords(lineText, uri) {
+  if (!lineText || !uri) {
+    return undefined;
+  }
+  const context = getBaseContext(lineText, uri);
+  const matches = [];
+  for (let i = 0; i < context.words.length; i++) {
+    const wordContext = {
+      ...context,
+      word: context.words[i],
+      index: context.words[i].start,
+      prevWord: (i === 0) ? undefined : context.words[i-1],
+      prevChar: lineText.charAt(context.words[i].start - 1),
+      nextChar: lineText.charAt(context.words[i].end + 1),
+    }
+    matches.push(match(wordContext));
+  }
+  return matches;
+}
+
+/**
+ * Context items shared by both matchWord and matchWords
+ */ 
+function getBaseContext(lineText, uri) {
   lineText = lineText.split('//')[0]; // Ignore anything after a comment
   const words = getWords(lineText);
-  const word = getWordAtIndex(words, index);
-  if (!word || word.value === 'null' || word.value.length <= 1) { // Also ignore null and single character words
-    return response(); 
-  }
-
-  const context = {
-    word: word,
+  const fileSplit = uri.path.split('\\').pop().split('/').pop().split('.');
+  return {
     words: words,
     uri: uri,
     line: lineText,
-    index: index,
-    prevWord: getWordAtIndex(words, word.start - 2),
-    prevChar: lineText.charAt(word.start - 1),
-    nextChar: lineText.charAt(word.end + 1),
-    fileType: uri.path.split(/[#?]/)[0].split('.').pop().trim(),
+    file: {name: fileSplit[0], type: fileSplit[1]},
+  }
+}
+
+/**
+ * Iterates thru all matchers to try to find a match, short circuits early if a match is made  
+ */
+function match(context) {
+  if (!context.word || context.word.value === 'null' || context.word.value.length <= 1) { // Also ignore null and single character words
+    return response(); 
   }
 
-  const matchers = [
-    regexWordMatcher,
-    commandMatcher,
-    localVarMatcher,
-    prevCharMatcher,
-    triggerMatcher,
-    configMatcher,
-    parametersMatcher
-  ];
-
   for (const matcher of matchers) {
-    let match = await matcher(context);
+    let match = matcher(context);
     if (match) {
       return response(match, context);
     }
@@ -55,8 +95,17 @@ async function matchWord(lineText, index, uri) {
   return response();
 }
 
+/**
+ * Build the response object for a match response
+ */ 
 function response(match, context) {
-  return (!match || !context) ? undefined : { match: match, word: context.word.value, context: context };
+  if (!match || !context) {
+    return undefined;
+  }
+  if (match.id === matchType.COMPONENT.id && !context.word.value.includes(':')) {
+    context.word.value = `${context.file.name}:${context.word.value}`;
+  }
+  return { match: match, word: context.word.value, context: context };
 }
 
-module.exports = { matchWord, matchWordFromDocument };
+module.exports = { matchWords, matchWordFromDocument };

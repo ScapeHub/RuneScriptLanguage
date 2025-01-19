@@ -1,16 +1,33 @@
-const stringUtils = require('../utils/stringUtils');
-const hoverDisplay = require('../enum/hoverDisplay');
-const displayConfig = require('./displayConfig');
 const dataTypeToMatchId = require('./dataTypeToMatchId');
+const hoverConfigResolver = require('./hoverConfigResolver');
+const { SIGNATURE, CODEBLOCK } = require('../enum/hoverDisplayItems');
+const { END_OF_BLOCK_LINE } = require('../enum/regex');
+const { LANGUAGE, BLOCK_SKIP_LINES, CONFIG_INCLUSIONS } = require('../enum/hoverConfigOptions');
+const matchType = require('../matching/matchType');
 
-function build(name, match, location, info, text) {
+/**
+ * Builds an identifier object
+ * identifier = {
+ *  name: String,
+ *  match: matchType,
+ *  declaration: vscode.Location
+ *  references: {filePath1: String[], filePath2: String[], ...} (String is encoded location value)
+ *  fileType: String,
+ *  language: String,
+ *  info?: String,
+ *  signature?: {params: {type: String, name: String, matchTypeId: String}[], returns: String, paramsText: String},
+ *  block?: String
+ * }
+ */
+function build(name, match, location, info = null, text = {lines: [], start: 0}) {
   const identifier = {
     name: name,
     match: match,
-    location: location,
+    declaration: location,
+    references: {},
     fileType: location ? location.uri.path.split(/[#?]/)[0].split('.').pop().trim() : 'rs2',
-    language: displayConfig.resolve(displayConfig.option.LANGUAGE, match),
-    text: text || ''
+    language: hoverConfigResolver.resolve(LANGUAGE, match),
+    text: text
   }
   if (info) identifier.info = info;
   addExtraData(identifier, match.extraData);
@@ -19,17 +36,12 @@ function build(name, match, location, info, text) {
 }
 
 function process(identifier) {
-  if (identifier.match.declarationConfig && identifier.match.referenceConfig) {
-    const displayItems = new Set();
-    identifier.match.declarationConfig.displayItems.forEach(displayItem => displayItems.add(displayItem));
-    identifier.match.referenceConfig.displayItems.forEach(displayItem => displayItems.add(displayItem));
-
-    // Process specififed display items
-    for (const displayItem of displayItems) {
-      switch(displayItem) {
-        case hoverDisplay.SIGNATURE: processSignature(identifier); break;
-        case hoverDisplay.CODEBLOCK: processCodeBlock(identifier); break;
-      }
+  // Process specififed display items
+  const hoverDisplayItems = hoverConfigResolver.resolveAllHoverItems(identifier.match);
+  for (const hoverDisplayItem of hoverDisplayItems) {
+    switch(hoverDisplayItem) {
+      case SIGNATURE: processSignature(identifier); break;
+      case CODEBLOCK: processCodeBlock(identifier); break;
     }
   }
 
@@ -46,7 +58,7 @@ function process(identifier) {
 
 function processSignature(identifier) {
   // Get first line of text, which should contain the data for parsing the signature
-  let line = stringUtils.getLineText(identifier.text);
+  let line = identifier.text.lines[identifier.text.start];
 
   // Parse input params
   const params = [];
@@ -77,12 +89,14 @@ function processSignature(identifier) {
 }
 
 function processCodeBlock(identifier) {
-  const blockLines = stringUtils.getLines(identifier.text);
-  const startIndex = displayConfig.resolve(displayConfig.option.BLOCK_SKIP_LINES, identifier.match);
-  const configInclusionTags = displayConfig.resolve(displayConfig.option.CONFIG_INCLUSIONS, identifier.match);
+  const lines = identifier.text.lines;
+  const startIndex = identifier.text.start + hoverConfigResolver.resolve(BLOCK_SKIP_LINES, identifier.match);
+  const configInclusionTags = hoverConfigResolver.resolve(CONFIG_INCLUSIONS, identifier.match);
   let blockInclusionLines = [];
-  for (let i = startIndex; i < blockLines.length; i++) {
-    let currentLine = blockLines[i];
+  if (identifier.match.id === matchType.CONSTANT.id) blockInclusionLines.push(lines[startIndex]);
+  for (let i = startIndex; i < lines.length; i++) {
+    let currentLine = lines[i];
+    if (END_OF_BLOCK_LINE.test(currentLine)) break;
     if (currentLine.startsWith('//')) continue;
     if (configInclusionTags && !configInclusionTags.some(inclusionTag => currentLine.startsWith(inclusionTag))) continue;
     blockInclusionLines.push(currentLine);

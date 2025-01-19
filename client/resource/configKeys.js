@@ -8,8 +8,8 @@ const configKeys = {
 
 // === REGEX CONFIG KEY MATCHES ===
 const regexConfigKeys = [
-  { match: matchType.OBJ, fileTypes: ["inv"], regex: /stock\d+/ },
-  { match: matchType.SEQ, fileTypes: ["loc", "npc", "if", "spotanim"], regex: /\w*anim\w*/ },
+  { regex: /stock\d+/, match: matchType.OBJ, fileTypes: ["inv"] },
+  { regex: /\w*anim\w*/, match: matchType.SEQ, fileTypes: ["loc", "npc", "if", "spotanim"] },
 ]
 
 module.exports = { configKeys, regexConfigKeys };

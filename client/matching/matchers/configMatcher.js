@@ -2,12 +2,15 @@ const { CONFIG_LINE, CONFIG_DECLARATION } = require("../../enum/regex");
 const { configKeys, regexConfigKeys } = require("../../resource/configKeys");
 const dataTypeToMatchId = require("../../resource/dataTypeToMatchId");
 const matchType = require("../matchType");
-const identifierSvc = require("../../service/identifierSvc");
+const identifierCache = require("../../cache/identifierCache");
 const { reference, declaration } = require("../../utils/matchUtils");
 
 const specialCaseCommandKeys = ['val', 'param'];
 
-async function configMatcher(context) {
+/**
+ * Looks for matches on config files, both config declarations and config line items
+ */
+function configMatcher(context) {
   // Check for config file declarations (i.e. declarations with [NAME])
   if (CONFIG_DECLARATION.test(context.line)) {
     return declarationMatcher(context);
@@ -22,7 +25,7 @@ async function configMatcher(context) {
     }
     // Check for special cases that need to be manually handled
     if (specialCaseCommandKeys.includes(configKey)) {
-      return await handleSpecialCases(configKey, context);
+      return handleSpecialCases(configKey, context);
     }
     // Otherwise, if the second word is the selected word (word after '=') then handle remaining known keys/regex keys
     if (context.word.index === 1) {
@@ -33,7 +36,7 @@ async function configMatcher(context) {
 }
 
 function declarationMatcher(context) {
-  switch (context.fileType) {
+  switch (context.file.type) {
     case "varp": case "varn": case "vars": return declaration(matchType.GLOBAL_VAR);
     case "obj": return declaration(matchType.OBJ);
     case "loc": return declaration(matchType.LOC);
@@ -49,12 +52,13 @@ function declarationMatcher(context) {
     case "spotanim": return declaration(matchType.SPOTANIM);
     case "idk": return declaration(matchType.IDK);
     case "mesanim": return declaration(matchType.MESANIM);
+    case "if": return declaration(matchType.COMPONENT)
   }
 }
 
 function checkRegexConfigKeys(configKey, context) {
   for (let regexKey of regexConfigKeys) {
-    if (regexKey.fileTypes.includes(context.fileType) && regexKey.regex.test(configKey)) {
+    if (regexKey.fileTypes.includes(context.file.type) && regexKey.regex.test(configKey)) {
       return reference(regexKey.match);
     }
   }
@@ -68,11 +72,13 @@ function handleSpecialCases(key, context) {
   }
 }
 
-async function paramSpecialCase(context) {
+function paramSpecialCase(context) {
   if (context.word.index === 1) return reference(matchType.PARAM);
   if (context.word.index === 2) {
-    const paramIdentifier = await identifierSvc.get(context.words[1].value, matchType.PARAM);
-    return matchType[dataTypeToMatchId(paramIdentifier.extraData.dataType)];
+    const paramIdentifier = identifierCache.get(context.words[1].value, matchType.PARAM);
+    if (paramIdentifier && paramIdentifier.extraData) {
+      return matchType[dataTypeToMatchId(paramIdentifier.extraData.dataType)];
+    }
   }
   return matchType.UNKNOWN;
 }

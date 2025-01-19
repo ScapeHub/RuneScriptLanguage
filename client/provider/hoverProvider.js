@@ -1,21 +1,25 @@
 const vscode = require('vscode');
 const path = require('path');
 const stringUtils = require('../utils/stringUtils');
-const searchSvc = require('../service/searchSvc');
+const localVarUtils = require('../utils/localVarUtils');
 const matchType = require('../matching/matchType');
-const identifierSvc = require('../service/identifierSvc');
+const identifierCache = require('../cache/identifierCache');
 const identifierFactory = require('../resource/identifierFactory');
-const { TITLE, INFO, VALUE, SIGNATURE, CODEBLOCK } = require('../enum/hoverDisplay');
+const { TITLE, INFO, VALUE, SIGNATURE, CODEBLOCK } = require('../enum/hoverDisplayItems');
 const { matchWordFromDocument } = require('../matching/matchWord');
+const { resolve } = require('../resource/hoverConfigResolver');
+const { DECLARATION_HOVER_ITEMS, REFERENCE_HOVER_ITEMS } = require('../enum/hoverConfigOptions');
 
 const hoverProvider = function(context) {
   return {
-    async provideHover(document, position, token) {
-      const { word, match } = await matchWordFromDocument(document, position);
+    async provideHover(document, position) {
+      // Find a match for the word user is hovering over, and ignore noop tagged matches
+      const { word, match } = matchWordFromDocument(document, position);
       if (!match || match.noop) {
         return null;
       }
 
+      // Setup the hover text markdown object
       const content = new vscode.MarkdownString();
       content.supportHtml = true;
       content.isTrusted = true;
@@ -29,45 +33,57 @@ const hoverProvider = function(context) {
       }
 
       // If no config found, or no items to display then exit early
-      const config = (match.declaration) ? match.declarationConfig : match.referenceConfig;
-      if (!config || config.displayItems.length === 0) {
+      const hoverDisplayItems = (match.declaration) ? resolve(DECLARATION_HOVER_ITEMS, match) : resolve(REFERENCE_HOVER_ITEMS, match);
+      if (hoverDisplayItems.length === 0) {
         return null;
       }
 
-      // If we only need to show title, then set the identifier as hover only to prevent unnecessary file search
-      if (config.displayItems.length === 1 && config.displayItems[0] === TITLE) {
+      // If we only need to show title, then set the identifier as hover only to prevent unnecessary operations
+      if (hoverDisplayItems.length === 1 && hoverDisplayItems[0] === TITLE) {
         match.hoverOnly = true;
       }
 
       // Build hover text based on identifier data
-      const identifier = await getIdentifier(word, match, document, position);
+      const identifier = getIdentifier(word, match, document, position);
+      if (!match.declaration && (!identifier || !identifier.declaration)) {
+        expectedIdentifierMessage(word, match, content);
+        return new vscode.Hover(content);
+      }
       if (!identifier || identifier.hideDisplay) {
         return null;
       }
       appendTitle(identifier.name, identifier.fileType, identifier.matchId, content);
-      appendInfo(identifier, config.displayItems, content);
-      appendValue(identifier, config.displayItems, content);
-      appendSignature(identifier, config.displayItems, content);
-      appendCodeBlock(identifier, config.displayItems, content);
+      appendInfo(identifier, hoverDisplayItems, content);
+      appendValue(identifier, hoverDisplayItems, content);
+      appendSignature(identifier, hoverDisplayItems, content);
+      appendCodeBlock(identifier, hoverDisplayItems, content);
       return new vscode.Hover(content);
     }
   };
 }
 
 function appendLocalVarHoverText(document, position, word, match, content) {
-  appendTitle(word, match.declarationConfig.fileTypes[0], match.id, content);
   if (match.declaration === false) {
     const fileText = document.getText(new vscode.Range(new vscode.Position(0, 0), position));
-    const match = searchSvc.findLocalVar(fileText, word);
-    const isDef = fileText.substring(Math.max(match.index - 4, 0), match.index) === "def_";
-    if (isDef) {
-      const line = stringUtils.getLineText(fileText.substring(match.index - 4));
-      content.appendCodeblock(line.substring(0, line.indexOf(";")), 'runescript');
+    const foundLocalVar = localVarUtils.findLocalVar(fileText, word);
+    if (!foundLocalVar) {
+      expectedIdentifierMessage(word, match, content);
     } else {
-      const lineText = stringUtils.getLineText(fileText.substring(match.index));
-      content.appendCodeblock(`parameter: ${lineText.substring(0, lineText.indexOf(word) + word.length)}`, 'runescript');
+      appendTitle(word, 'rs2', match.id, content);
+      const isDef = fileText.substring(Math.max(foundLocalVar.index - 4, 0), foundLocalVar.index) === "def_";
+      if (isDef) {
+        const line = stringUtils.getLineText(fileText.substring(foundLocalVar.index - 4));
+        content.appendCodeblock(line.substring(0, line.indexOf(";")), 'runescript');
+      } else {
+        const lineText = stringUtils.getLineText(fileText.substring(foundLocalVar.index));
+        content.appendCodeblock(`parameter: ${lineText.substring(0, lineText.indexOf(word) + word.length)}`, 'runescript');
+      }
     }
   }
+}
+
+function expectedIdentifierMessage(word, match, content) {
+  content.appendMarkdown(`<img src="warning.png">&ensp;<b>${match.id}</b>&ensp;<i>${word}</i> not found`);
 }
 
 function appendTitle(name, type, matchId, content) {
@@ -106,11 +122,11 @@ function appendBody(text, content) {
   content.appendMarkdown(`\n\n${text}`);
 }
 
-async function getIdentifier(word, match, document, position) {
+function getIdentifier(word, match, document, position) {
   if (match.hoverOnly) {
     return identifierFactory.build(word, match, new vscode.Location(document.uri, position));
   }
-  return await identifierSvc.get(word, match, match.declaration ? document.uri : null);
+  return identifierCache.get(word, match, match.declaration ? document.uri : null);
 }
 
 module.exports = hoverProvider;

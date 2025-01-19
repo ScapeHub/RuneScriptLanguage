@@ -1,12 +1,13 @@
 const vscode = require('vscode');
-const searchSvc = require("../service/searchSvc");
-const identifierSvc = require("../service/identifierSvc");
+const localVarUtils = require("../utils/localVarUtils");
+const identifierCache = require("../cache/identifierCache");
 const matchType = require('../matching/matchType');
 const { matchWordFromDocument } = require('../matching/matchWord');
 
 const gotoDefinitionProvider = {
-  async provideDefinition(document, position, token) {
-    const { match, word } = await matchWordFromDocument(document, position)
+  async provideDefinition(document, position) {
+    // Get a match for the current word, and ignore noop or hover only tagged matches
+    const { match, word } = matchWordFromDocument(document, position)
     if (!match || match.noop || match.isHoverOnly) {
       return null;
     }
@@ -27,13 +28,13 @@ const gotoDefinitionProvider = {
 
 const gotoLocalVar = (document, position, word) => {
   const fileText = document.getText(new vscode.Range(new vscode.Position(0, 0), position));
-  const match = searchSvc.findLocalVar(fileText, word);
+  const match = localVarUtils.findLocalVar(fileText, word);
   return !match ? null : new vscode.Location(document.uri, document.positionAt(match.index).translate(0, match[1].length + 1));
 }
 
 const gotoDefinition = async (word, match) => {
-  const definition = await identifierSvc.get(word, match);
-  return (definition) ? definition.location : null;
+  const definition = identifierCache.get(word, match);
+  return (definition) ? definition.declaration : null;
 }
 
 module.exports = gotoDefinitionProvider;

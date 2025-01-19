@@ -1,12 +1,13 @@
-const { commands } = require('../../resource/engineCommands');
 const matchType = require('../matchType');
-const identifierSvc = require('../../service/identifierSvc');
+const identifierCache = require('../../cache/identifierCache');
 const { reference, getWordAtIndex } = require("../../utils/matchUtils");
 
-// Looks for matches of values inside of parenthesis
-// This includes engine command parameters, proc parameters, label parameters, and queue parameters
-async function parametersMatcher(context) {
-  if (context.fileType !== 'rs2') {
+/**
+ * Looks for matches of values inside of parenthesis
+ * This includes engine command parameters, proc parameters, label parameters, and queue parameters
+ */ 
+function parametersMatcher(context) {
+  if (context.file.type !== 'rs2') {
     return null;
   }
   const { identifierName, paramIndex } = parseForIdentifierNameAndParamIndex(context);
@@ -21,13 +22,13 @@ async function parametersMatcher(context) {
     if (paramIndex === 1) return matchType.UNKNOWN;
     const queueName = getWordAtIndex(context.words, identifierName.end + 2);
     if (!queueName) return matchType.UNKNOWN;
-    identifier = await identifierSvc.get(queueName.value, matchType.QUEUE);
+    identifier = identifierCache.get(queueName.value, matchType.QUEUE);
   } else if (prev === '@') {
-    identifier = await identifierSvc.get(name, matchType.LABEL);
+    identifier = identifierCache.get(name, matchType.LABEL);
   } else if (prev === '~') {
-    identifier = await identifierSvc.get(name, matchType.PROC);
+    identifier = identifierCache.get(name, matchType.PROC);
   } else {
-    identifier = commands[name];
+    identifier = identifierCache.get(name, matchType.COMMAND);
   }
   if (!identifier || !identifier.signature || identifier.signature.params.length <= paramIndex) {
     return null;
@@ -65,7 +66,7 @@ function parseForIdentifierNameAndParamIndex(context) {
       return {identifierName: getWordAtIndex(context.words, i - 1), paramIndex: paramIndex};
     }
   }
-  return null;
+  return {identifierName: null, paramIndex: null};
 }
 
 module.exports = parametersMatcher;

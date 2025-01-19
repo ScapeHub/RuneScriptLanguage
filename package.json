@@ -4,7 +4,7 @@
     "publisher": "2004scape",
     "repository": "https://github.com/2004scape/RuneScriptLanguage",
     "description": "Syntax highlighting for RuneScript.",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "engines": {
         "vscode": "^1.75.0"
     },
@@ -517,6 +517,12 @@
             {
                 "language": "runescript",
                 "path": "./snippets/snippets.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "RuneScriptLanguage.rebuildCache",
+                "title": "Runescript: Rebuild Workspace Cache"
             }
         ]
     }

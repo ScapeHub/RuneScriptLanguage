@@ -3,9 +3,11 @@ const matchType = require("../matchType");
 const triggers = require("../../resource/triggers");
 const { reference, declaration } = require("../../utils/matchUtils");
 
-// Looks for matches with known runescript triggers
-async function triggerMatcher(context) {
-  if (context.fileType !== 'rs2') {
+/**
+ * Looks for matches with known runescript triggers, see triggers.js
+ */ 
+function triggerMatcher(context) {
+  if (context.file.type !== 'rs2') {
     return null;
   }
   if (TRIGGER_LINE.test(context.line) && context.word.index <= 1) {

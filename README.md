@@ -12,8 +12,9 @@
 * Recoloring configs using a color picker
 * Goto definitions (ctrl+click)
 * Info displayed on hover
+* Find all references
 
 #### Coming soon™
 
-* Find all references
 * Rename symbol accross files
+* Autocomplete suggestions when typing procs, etc...

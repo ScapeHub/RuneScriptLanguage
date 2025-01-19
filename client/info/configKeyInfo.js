@@ -1,10 +1,11 @@
 const { expandCsvKeyObject } = require("../utils/matchUtils");
 
-// === CONFIG KEY INFORMATION ===
-// Define any config keys with info that will be displayed when the user hovers over that config key
-// Format: { key: { 'any': 'info for any fileType', 'obj': 'obj specific info', 'loc, npc': 'loc and npc specific info' } }
-// You can define different info for specific file types, or use 'any' to apply to all file types (unless already defined)
-// Tip: you can use the same value for multiple file types using a key as a CSV (i.e. use 'obj, loc, npc' as a key)
+/** 
+ * Defines any config keys with info that will be displayed when the user hovers over that config key
+ * Format: { key: { 'any': 'info for any fileType', 'obj': 'obj specific info', 'loc, npc': 'loc and npc specific info' } }
+ * You can define different info for specific file types, or use 'any' to apply to all file types (unless already defined)
+ * Tip: you can use the same value for multiple file types using a key as a CSV (i.e. use 'obj, loc, npc' as a key)
+ */
 const configKeyInfo = expandInfo({
   type: { 'varp': 'The data type of this player variable' },
   param: { 'any': 'A param value in the format paramName,value' },
