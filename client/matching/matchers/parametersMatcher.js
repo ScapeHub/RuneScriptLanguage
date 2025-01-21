@@ -1,10 +1,11 @@
 const matchType = require('../matchType');
 const identifierCache = require('../../cache/identifierCache');
 const { reference, getWordAtIndex } = require("../../utils/matchUtils");
+const blockReferenceCache = require('../../cache/blockReferenceCache');
 
 /**
  * Looks for matches of values inside of parenthesis
- * This includes engine command parameters, proc parameters, label parameters, and queue parameters
+ * This includes return statement params, engine command parameters, proc parameters, label parameters, and queue parameters
  */ 
 function parametersMatcher(context) {
   if (context.file.type !== 'rs2') {
@@ -17,7 +18,16 @@ function parametersMatcher(context) {
   const name = identifierName.value;
   const prev = context.line.charAt(identifierName.start - 1);
   let identifier;
-  if (name === 'queue') {
+  if (name === 'return') {
+    const blockIdentifierKey = blockReferenceCache.get(context.lineNum, context.uri);
+    if (blockIdentifierKey) {
+      identifier = identifierCache.getByKey(blockIdentifierKey);
+      if (identifier && identifier.signature.returns.length > paramIndex) {
+        return reference(matchType[identifier.signature.returns[paramIndex]]);
+      }
+    }
+    return matchType.UNKNOWN;
+  } else if (name === 'queue') {
     if (paramIndex === 0) return reference(matchType.QUEUE);
     if (paramIndex === 1) return matchType.UNKNOWN;
     const queueName = getWordAtIndex(context.words, identifierName.end + 2);
@@ -63,7 +73,7 @@ function parseForIdentifierNameAndParamIndex(context) {
     if (str.charAt(i) === ',') {
       paramIndex++;
     } else if (str.charAt(i) === '(') {
-      return {identifierName: getWordAtIndex(context.words, i - 1), paramIndex: paramIndex};
+      return {identifierName: getWordAtIndex(context.words, i - 2), paramIndex: paramIndex};
     }
   }
   return {identifierName: null, paramIndex: null};

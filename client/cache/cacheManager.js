@@ -2,14 +2,15 @@ const fs = require('fs').promises;
 const vscode = require('vscode');
 const matchType = require("../matching/matchType");
 const identifierCache = require('./identifierCache');
+const blockReferenceCache = require('./blockReferenceCache');
 const stringUtils = require('../utils/stringUtils');
 const { matchWords } = require('../matching/matchWord');
 const identifierFactory = require('../resource/identifierFactory');
-const { INFO_MATCHER } = require('../enum/regex');
+const { INFO_MATCHER, TRIGGER_LINE } = require('../enum/regex');
 
 /**
  * Builds the set of monitored file types, any file events with other file types will be ignored
- * Monitored file types is determined by checking all file types defined in the matchType object
+ * Monitored file types are determined by checking all file types defined in the matchType object
  */
 const monitoredFileTypes = new Set();
 function determineFileTypes() {
@@ -29,7 +30,7 @@ function determineFileTypes() {
  */
 async function rebuildAll() {
   if (monitoredFileTypes.size === 0) determineFileTypes();
-  identifierCache.clear();
+  clearAll();
   const fileUris = await getFiles();
   await Promise.all(fileUris.map(uri => parseFileAndCacheIdentifiers(uri)));
   return Promise.all(fileUris.map(uri => parseFileAndCacheIdentifiers(uri)));
@@ -40,7 +41,7 @@ async function rebuildAll() {
  */
 async function rebuildFile(uri) {
   if (isValidFile(uri)) {
-    identifierCache.clearFile(uri);
+    clearFile(uri);
     parseFileAndCacheIdentifiers(uri);
   }
 }
@@ -51,7 +52,7 @@ async function rebuildFile(uri) {
 async function clearFiles(uris) {
   for (const uri of uris) {
     if (isValidFile(uri)) {
-      identifierCache.clearFile(uri);
+      clearFile(uri);
     }
   }
 }
@@ -63,7 +64,7 @@ async function clearFiles(uris) {
 async function renameFiles(uriPairs) {
   for (const uriPair of uriPairs) {
     if (isValidFile(uriPair.oldUri) && isValidFile(uriPair.newUri)) {
-      identifierCache.clearFile(uriPair.oldUri);
+      clearFile(uriPair.oldUri);
       parseFileAndCacheIdentifiers(uriPair.newUri);
     }
   }
@@ -99,10 +100,11 @@ async function parseFileAndCacheIdentifiers(uri) {
     const identifier = identifierFactory.build(fileSplit[0], matchType.INTERFACE, location, null, []);
     identifierCache.put(fileSplit[0], matchType.INTERFACE, identifier);
   }
+  const isRs2 = uri.path.endsWith('.rs2');
   const fileText = await fs.readFile(uri.path, "utf8");
   const lines = stringUtils.getLines(fileText);
   for (let line = 0; line < lines.length; line++) {
-    const matches = (matchWords(lines[line], uri) || []).filter(match => match && match.match.cache); 
+    const matches = (matchWords(lines[line], line, uri) || []).filter(match => match && match.match.cache); 
     if (matches.length > 0) {
       const text = {lines: null, start: 0};
       matches.forEach(match => {
@@ -112,6 +114,9 @@ async function parseFileAndCacheIdentifiers(uri) {
           const info = (line > 0) ? getInfo(lines[line - 1]) : null;
           const identifier = identifierFactory.build(match.word, match.match, location, info, text);
           identifierCache.put(match.word, match.match, identifier);
+          if (isRs2 && identifier.signature.returns.length > 0 && TRIGGER_LINE.test(lines[line])) {
+            blockReferenceCache.put(line + 1, match.word, match.match, uri);
+          }
         } else {
           identifierCache.putReference(match.word, match.match, uri, line, match.context.word.start);
         }
@@ -137,10 +142,19 @@ function isValidFile(uri) {
 }
 
 /**
- * Empty the cache entirely
+ * Empty the caches entirely
  */
 function clearAll() {
   identifierCache.clear();
+  blockReferenceCache.clear();
+}
+
+/**
+ * Empty the caches for a single file
+ */
+function clearFile(uri) {
+  identifierCache.clearFile(uri);
+  blockReferenceCache.clearFile(uri);
 }
 
 module.exports = { rebuildAll, rebuildFile, clearFiles, renameFiles, createFiles, clearAll }

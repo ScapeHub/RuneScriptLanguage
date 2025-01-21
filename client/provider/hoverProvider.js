@@ -105,7 +105,7 @@ function appendValue(identifier, displayItems, content) {
 function appendSignature(identifier, displayItems, content) {
   if (displayItems.includes(SIGNATURE) && identifier.signature) {
     if (identifier.signature.paramsText.length > 0) content.appendCodeblock(`params: ${identifier.signature.paramsText}`, identifier.language);
-    if (identifier.signature.returns.length > 0) content.appendCodeblock(`returns: ${identifier.signature.returns}`, identifier.language);
+    if (identifier.signature.returnsText.length > 0) content.appendCodeblock(`returns: ${identifier.signature.returnsText}`, identifier.language);
   }
 }
 

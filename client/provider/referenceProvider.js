@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const { matchWordFromDocument } = require('../matching/matchWord');
 const identifierCache = require('../cache/identifierCache');
-const identifierUtils = require('../utils/identifierUtils');
+const cacheUtils = require('../utils/cacheUtils');
 
 const referenceProvider = {
   async provideReferences(document, position) {
@@ -26,7 +26,7 @@ const referenceProvider = {
     const referenceLocations = [];
     Object.keys(identifier.references).forEach(fileKey => {
       identifier.references[fileKey].forEach(encodedReference => 
-        referenceLocations.push(identifierUtils.decodeReference(vscode.Uri.file(fileKey), encodedReference)));
+        referenceLocations.push(cacheUtils.decodeReference(vscode.Uri.file(fileKey), encodedReference)));
     });
     return referenceLocations;
   }

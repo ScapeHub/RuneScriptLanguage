@@ -1,4 +1,4 @@
-const identifierUtils = require('../utils/identifierUtils');
+const cacheUtils = require('../utils/cacheUtils');
 
 /**
  * The identifierCache stores all matched identifiers in the workspace
@@ -15,16 +15,20 @@ var identifierCache = {};
 var fileToIdentifierMap = {};
 
 function contains(name, match) {
-  return identifierCache[resolveKey(name, match)] !== undefined;
+  return identifierCache[cacheUtils.resolveKey(name, match)] !== undefined;
 }
 
 function get(name, match) {
-  return identifierCache[resolveKey(name, match)];
+  return identifierCache[cacheUtils.resolveKey(name, match)];
+}
+
+function getByKey(key) {
+  return identifierCache[key];
 }
 
 function put(name, match, identifier) {
-  const key = resolveKey(name, match);
-  const fileKey = resolveFileKey(identifier.declaration.uri);
+  const key = cacheUtils.resolveKey(name, match);
+  const fileKey = cacheUtils.resolveFileKey(identifier.declaration.uri);
   if (!key || !fileKey) {
     return null;
   }
@@ -40,8 +44,8 @@ function put(name, match, identifier) {
 }
 
 function putReference(name, match, uri, lineNum, index) {
-  const key = resolveKey(name, match)
-  const fileKey = resolveFileKey(uri);
+  const key = cacheUtils.resolveKey(name, match)
+  const fileKey = cacheUtils.resolveFileKey(uri);
   if (!key || !fileKey) {
     return null;
   }
@@ -49,7 +53,7 @@ function putReference(name, match, uri, lineNum, index) {
     identifierCache[key] = {references: {}};
   } 
   const fileReferences = identifierCache[key].references[fileKey] || new Set();
-  fileReferences.add(identifierUtils.endcodeReference(lineNum, index));
+  fileReferences.add(cacheUtils.encodeReference(lineNum, index));
   addToFileMap(fileKey, key, false);
   identifierCache[key].references[fileKey] = fileReferences;
 }
@@ -60,7 +64,7 @@ function clear() {
 }
 
 function clearFile(uri) {
-  const fileKey = resolveFileKey(uri);
+  const fileKey = cacheUtils.resolveFileKey(uri);
   const identifiersInFile = fileToIdentifierMap[fileKey] || { declarations: new Set(), references: new Set() };
   identifiersInFile.references.forEach(key => {
     if (identifierCache[key] && identifierCache[key].references[fileKey]) {
@@ -77,18 +81,10 @@ function clearFile(uri) {
   delete fileToIdentifierMap[fileKey];
 }
 
-function resolveKey(name, match) {
-  return (!name || !match) ? null : name + match.id;
-}
-
-function resolveFileKey(uri) {
-  return (uri) ? uri.path : null;
-}
-
 function addToFileMap(fileKey, identifierKey, declaration=true) {
   const identifiersInFile = fileToIdentifierMap[fileKey] || { declarations: new Set(), references: new Set() };
   (declaration) ? identifiersInFile.declarations.add(identifierKey) : identifiersInFile.references.add(identifierKey);
   fileToIdentifierMap[fileKey] = identifiersInFile;
 }
 
-module.exports = { contains, get, put, putReference, clear, clearFile };
+module.exports = { contains, get, getByKey, put, putReference, clear, clearFile };

@@ -3,7 +3,7 @@ const hoverProvider = require('./provider/hoverProvider');
 const recolorProvider = require('./provider/recolorProvider');
 const definitionProvider = require('./provider/gotoDefinition');
 const referenceProvider = require('./provider/referenceProvider');
-const cacheProcessor = require('./cache/cacheProcessor');
+const cacheManager = require('./cache/cacheManager');
 const commands = require('./provider/vscodeCommands');
 
 const languages = ['runescript','locconfig','objconfig','npcconfig','dbtableconfig','dbrowconfig','paramconfig','structconfig','enumconfig','varpconfig','varnconfig','varsconfig','invconfig','seqconfig','spotanimconfig','mesanimconfig','idkconfig','huntconfig','constants','interface'];
@@ -18,10 +18,10 @@ function activate(context) {
 
     // Cache processing event handlers for git branch changes, updating files, create/rename/delete files
     vscode.workspace.createFileSystemWatcher('**/.git/HEAD').onDidCreate(() => vscode.commands.executeCommand(rebuildCacheCommand));
-    vscode.workspace.onDidSaveTextDocument(saveDocumentEvent => cacheProcessor.rebuildFile(saveDocumentEvent.uri));
-    vscode.workspace.onDidDeleteFiles(filesDeletedEvent => cacheProcessor.clearFiles(filesDeletedEvent.files));
-    vscode.workspace.onDidRenameFiles(filesRenamedEvent => cacheProcessor.renameFiles(filesRenamedEvent.files));
-    vscode.workspace.onDidCreateFiles(filesCreatedEvent => cacheProcessor.createFiles(filesCreatedEvent.files));
+    vscode.workspace.onDidSaveTextDocument(saveDocumentEvent => cacheManager.rebuildFile(saveDocumentEvent.uri));
+    vscode.workspace.onDidDeleteFiles(filesDeletedEvent => cacheManager.clearFiles(filesDeletedEvent.files));
+    vscode.workspace.onDidRenameFiles(filesRenamedEvent => cacheManager.renameFiles(filesRenamedEvent.files));
+    vscode.workspace.onDidCreateFiles(filesCreatedEvent => cacheManager.createFiles(filesCreatedEvent.files));
 
     // Register hover, definition, and reference providers
     for (const language of languages) {
@@ -39,7 +39,7 @@ function activate(context) {
 }
 
 function deactivate() {
-    cacheProcessor.clearAll();
+    cacheManager.clearAll();
  }
 
 module.exports = {

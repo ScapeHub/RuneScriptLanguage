@@ -75,17 +75,19 @@ function processSignature(identifier) {
   }
 
   // Parse response type
-  let returns = '';
+  let returns = [];
+  let returnsText = '';
   line = line.substring(closingIndex + 1);
   openingIndex = line.indexOf('(');
   closingIndex = line.indexOf(')');
   if (openingIndex >= 0 && closingIndex >= 0 && ++openingIndex !== closingIndex) {
-    returns = line.substring(openingIndex, closingIndex);
+    returnsText = line.substring(openingIndex, closingIndex);
+    returns = line.substring(openingIndex, closingIndex).split(',').map(item => dataTypeToMatchId(item.trim()));
   }
 
   // Add signature to identifier
   const paramsText = (params.length > 0) ? params.map(param => `${param.type} ${param.name}`).join(', ') : '';
-  identifier.signature = {params: params, returns: returns, paramsText: paramsText};
+  identifier.signature = {params: params, returns: returns, paramsText: paramsText, returnsText: returnsText};
 }
 
 function processCodeBlock(identifier) {

@@ -17,17 +17,17 @@ const matchers = [
  * Match with one word given a vscode document and a vscode position
  */
 function matchWordFromDocument(document, position) {
-  return matchWord(document.lineAt(position.line).text, document.uri, position.character);
+  return matchWord(document.lineAt(position.line).text, position.line, document.uri, position.character);
 }
 
 /**
  * Match with one word given a line of text and an index position
  */
-function matchWord(lineText, uri, index) {
+function matchWord(lineText, lineNum, uri, index) {
   if (!lineText || !uri || !index) {
     return undefined;
   }
-  const context = getBaseContext(lineText, uri);
+  const context = getBaseContext(lineText, lineNum, uri);
   const word = getWordAtIndex(context.words, index);
   const wordContext = {
     ...context,
@@ -43,11 +43,11 @@ function matchWord(lineText, uri, index) {
 /**
  * Match with all words given a line of text
  */
-function matchWords(lineText, uri) {
+function matchWords(lineText, lineNum, uri) {
   if (!lineText || !uri) {
     return undefined;
   }
-  const context = getBaseContext(lineText, uri);
+  const context = getBaseContext(lineText, lineNum, uri);
   const matches = [];
   for (let i = 0; i < context.words.length; i++) {
     const wordContext = {
@@ -66,7 +66,7 @@ function matchWords(lineText, uri) {
 /**
  * Context items shared by both matchWord and matchWords
  */ 
-function getBaseContext(lineText, uri) {
+function getBaseContext(lineText, lineNum, uri) {
   lineText = lineText.split('//')[0]; // Ignore anything after a comment
   const words = getWords(lineText);
   const fileSplit = uri.path.split('\\').pop().split('/').pop().split('.');
@@ -74,6 +74,7 @@ function getBaseContext(lineText, uri) {
     words: words,
     uri: uri,
     line: lineText,
+    lineNum: lineNum,
     file: {name: fileSplit[0], type: fileSplit[1]},
   }
 }
