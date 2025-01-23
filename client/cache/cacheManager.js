@@ -111,12 +111,16 @@ async function parseFileAndCacheIdentifiers(uri) {
         if (match.match.declaration) {
           text.lines = (text.lines) ? text.lines : lines.slice(line);
           const location = new vscode.Location(uri, new vscode.Position(line, match.context.word.start));
-          const info = (line > 0) ? getInfo(lines[line - 1]) : null;
+          let info = (line > 0) ? getInfo(lines[line - 1]) : null;
+          if (!info && uri.path.endsWith('engine.rs2')) {
+            info = engineSpecificInfo(lines[line - 1], match.word)
+          } 
           const identifier = identifierFactory.build(match.word, match.match, location, info, text);
           identifierCache.put(match.word, match.match, identifier);
           cacheReturnBlock(identifier, line, match);
         } else {
-          identifierCache.putReference(match.word, match.match, uri, line, match.context.word.start);
+          const id = match.context.cert ? undefined : match.context.packId;
+          identifierCache.putReference(match.word, match.match, uri, line, match.context.word.start, id);
         }
       });
     }
@@ -157,6 +161,23 @@ function getInfo(infoLine) {
   if (!infoLine) return null;
   const infoMatch = INFO_MATCHER.exec(infoLine);
   return (infoMatch && infoMatch[2]) ? infoMatch[2].trim() : null;
+}
+
+/**
+ * Gets info for engine commands specifically
+ * @deprecated Will remove engine.rs2 specific code in future, and enforce usage of generic info tagging
+ */
+function engineSpecificInfo(infoLine, commandName) {
+  if (commandName.charAt(0) === '.') {
+    const regCommand = identifierCache.get(commandName.substring(1), matchType.COMMAND);
+    if (regCommand.info) {
+      return regCommand.info;
+    }
+  }
+  if (infoLine && infoLine.startsWith('// ')) {
+    return infoLine.substring(3);
+  }
+  return null;
 }
 
 /**

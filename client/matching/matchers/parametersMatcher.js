@@ -49,30 +49,31 @@ function parametersMatcher(context) {
 function parseForIdentifierNameAndParamIndex(context) {
   const str = context.line.text;
   let isInString = false;
-  let isInParams = false;
+  let isInParams = 0;
   let paramIndex = 0;
   for (let i = context.lineIndex; i >= 0; i--) {
+    const char = str.charAt(i);
     if (isInString) {
-      if (str.charAt(i) === '"') isInString = false;
+      if (char === '"') isInString = false;
       continue;
     }
-    else if (str.charAt(i) === '"') {
+    else if (char === '"') {
       isInString = true;
       continue;
     }
 
-    if (isInParams) {
-      if (str.charAt(i) === '(') isInParams = false;
+    if (char === ')') {
+      isInParams++;
       continue;
     }
-    else if (str.charAt(i) === ')') {
-      isInParams = true;
+    if (isInParams > 0) {
+      if (char === '(') isInParams--;
       continue;
     }
 
-    if (str.charAt(i) === ',') {
+    if (char === ',') {
       paramIndex++;
-    } else if (str.charAt(i) === '(') {
+    } else if (char === '(') {
       return {identifierName: getWordAtIndex(context.words, i - 2), paramIndex: paramIndex};
     }
   }

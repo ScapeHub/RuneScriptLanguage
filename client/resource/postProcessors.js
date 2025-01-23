@@ -22,9 +22,10 @@ const enumPostProcessor = function(identifier) {
   identifier.extraData = {inputType: inputtypeLine.substring(10), outputType: outputtypeLine.substring(11)};
 }
 
-const paramPostProcessor = function(identifier) {
-  const typeLine = getLineText(identifier.block.substring(identifier.block.indexOf("type=")));
-  identifier.extraData = {dataType: typeLine.substring(5)};
+const dataTypePostProcessor = function(identifier) {
+  const index = identifier.block.indexOf("type=");
+  const dataType = (index < 0) ? 'int' : getLineText(identifier.block.substring(index)).substring(5);
+  identifier.extraData = {dataType: dataType};
 }
 
 const configKeyPostProcessor = function(identifier) {
@@ -50,7 +51,13 @@ const componentPostProcessor = function(identifier) {
   identifier.name = split[1];
 }
 
+const columnPostProcessor = function(identifier) {
+  const split = identifier.name.split(':');
+  identifier.info = `A column of the <b>${split[0]}</b> table`;
+  identifier.name = split[1];
+}
+
 module.exports = { 
-  queuePostProcessor, coordPostProcessor, enumPostProcessor, paramPostProcessor, configKeyPostProcessor, 
-  triggerPostProcessor, categoryTriggerPostProcessor, componentPostProcessor
+  queuePostProcessor, coordPostProcessor, enumPostProcessor, dataTypePostProcessor, configKeyPostProcessor, 
+  triggerPostProcessor, categoryTriggerPostProcessor, componentPostProcessor, columnPostProcessor
 };

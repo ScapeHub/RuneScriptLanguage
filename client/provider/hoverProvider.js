@@ -38,11 +38,6 @@ const hoverProvider = function(context) {
         return null;
       }
 
-      // If we only need to show title, then set the identifier as hover only to prevent unnecessary operations
-      if (hoverDisplayItems.length === 1 && hoverDisplayItems[0] === TITLE) {
-        match.hoverOnly = true;
-      }
-
       // Build hover text based on identifier data
       const identifier = getIdentifier(word, match, document, position);
       if (!match.declaration && (!identifier || !identifier.declaration)) {
@@ -52,8 +47,7 @@ const hoverProvider = function(context) {
       if (!identifier || identifier.hideDisplay) {
         return null;
       }
-      const name = (matchContext.cert) ? `${identifier.name} (cert)` : identifier.name;
-      appendTitle(name, identifier.fileType, identifier.matchId, content);
+      appendTitle(identifier.name, identifier.fileType, identifier.matchId, content, identifier.id, matchContext.cert);
       appendInfo(identifier, hoverDisplayItems, content);
       appendValue(identifier, hoverDisplayItems, content);
       appendSignature(identifier, hoverDisplayItems, content);
@@ -87,7 +81,12 @@ function expectedIdentifierMessage(word, match, content) {
   content.appendMarkdown(`<img src="warning.png">&ensp;<b>${match.id}</b>&ensp;<i>${word}</i> not found`);
 }
 
-function appendTitle(name, type, matchId, content) {
+function appendTitle(name, type, matchId, content, id, isCert) {
+  if (isCert && id) {
+    name = `${name} (cert) [${Number(id) + 1}]`;
+  } else if (id) {
+    name = `${name} [${id}]`;
+  }
   content.appendMarkdown(`<img src="${type}.png">&ensp;<b>${matchId}</b>&ensp;${name}`);
 }
 

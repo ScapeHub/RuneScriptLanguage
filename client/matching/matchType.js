@@ -23,6 +23,7 @@ const matchType = {
   GLOBAL_VAR: {
     id: 'GLOBAL_VAR', types: [], fileTypes: ['varp', 'vars', 'varn'], cache: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'varpconfig'},
+    postProcessor: postProcessors.dataTypePostProcessor
   },
   CONSTANT: {
     id: 'CONSTANT', types: [], fileTypes: ['constant'], cache: true,
@@ -75,7 +76,7 @@ const matchType = {
   },
   INV: {
     id: 'INV', types: ['inv'], fileTypes: ['inv'], cache: true,
-    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'invconfig'},
+    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'invconfig', [CONFIG_INCLUSIONS]: ['scope', 'size']},
   },
   ENUM: {
     id: 'ENUM', types: ['enum'], fileTypes: ['enum'], cache: true,
@@ -84,11 +85,11 @@ const matchType = {
   },
   DBCOLUMN: {
     id: 'DBCOLUMN', types: ['dbcolumn'], fileTypes: ['dbrow'], cache: true,
-    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbrowconfig'},
+    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [], [REFERENCE_HOVER_ITEMS]: [], [LANGUAGE]: 'dbrowconfig'},
   },
   DBROW: {
     id: 'DBROW', types: ['dbrow'], fileTypes: ['dbrow'], cache: true,
-    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbrowconfig'},
+    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbrowconfig', [CONFIG_INCLUSIONS]: ['table']},
   },
   DBTABLE: {
     id: 'DBTABLE', types: ['dbtable'], fileTypes: ['dbtable'], cache: true,
@@ -106,7 +107,7 @@ const matchType = {
   PARAM: {
     id: 'PARAM', types: ['param'], fileTypes: ['param'], cache: true,
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'paramconfig'},
-    postProcessor: postProcessors.paramPostProcessor
+    postProcessor: postProcessors.dataTypePostProcessor
   },
   COMMAND: {
     id: 'COMMAND', types: [], fileTypes: ['rs2'], cache: true,

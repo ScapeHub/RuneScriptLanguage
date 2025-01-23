@@ -36,14 +36,15 @@ function put(name, match, identifier) {
   if (curIdentifier && curIdentifier.declaration) {
     return null; // declaration already exists, don't overwrite, if it needs to be updated it should be deleted first
   }
-  if (curIdentifier && !curIdentifier.declaration) {
-    identifier.references = curIdentifier.references;
-  } 
+  if (curIdentifier) {
+    if (curIdentifier.id) identifier.id = curIdentifier.id;
+    if (!curIdentifier.declaration) identifier.references = curIdentifier.references;
+  }
   addToFileMap(fileKey, key);
   identifierCache[key] = identifier;
 }
 
-function putReference(name, match, uri, lineNum, index) {
+function putReference(name, match, uri, lineNum, index, packId) {
   const key = cacheUtils.resolveKey(name, match)
   const fileKey = cacheUtils.resolveFileKey(uri);
   if (!key || !fileKey) {
@@ -56,6 +57,7 @@ function putReference(name, match, uri, lineNum, index) {
   fileReferences.add(cacheUtils.encodeReference(lineNum, index));
   addToFileMap(fileKey, key, false);
   identifierCache[key].references[fileKey] = fileReferences;
+  if (packId) identifierCache[key].id = packId;
 }
 
 function clear() {
