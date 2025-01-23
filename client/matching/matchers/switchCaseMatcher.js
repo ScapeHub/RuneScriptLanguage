@@ -4,7 +4,7 @@ const { reference } = require("../../utils/matchUtils");
 const switchStmtLinesCache = require("../../cache/switchStmtLinesCache");
 
 /**
- * Looks for matches with direct word regex checks, such as for coordinates
+ * Looks for matches in case statements
  */ 
 function switchCaseMatcher(context) {
   if (context.file.type === 'rs2' && context.word.index > 0 && context.word.value !== 'default' &&

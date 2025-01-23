@@ -14,7 +14,7 @@ const hoverProvider = function(context) {
   return {
     async provideHover(document, position) {
       // Find a match for the word user is hovering over, and ignore noop tagged matches
-      const { word, match } = matchWordFromDocument(document, position);
+      const { word, match, context: matchContext } = matchWordFromDocument(document, position);
       if (!match || match.noop) {
         return null;
       }
@@ -52,7 +52,8 @@ const hoverProvider = function(context) {
       if (!identifier || identifier.hideDisplay) {
         return null;
       }
-      appendTitle(identifier.name, identifier.fileType, identifier.matchId, content);
+      const name = (matchContext.cert) ? `${identifier.name} (cert)` : identifier.name;
+      appendTitle(name, identifier.fileType, identifier.matchId, content);
       appendInfo(identifier, hoverDisplayItems, content);
       appendValue(identifier, hoverDisplayItems, content);
       appendSignature(identifier, hoverDisplayItems, content);

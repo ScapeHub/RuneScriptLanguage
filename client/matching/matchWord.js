@@ -4,6 +4,7 @@ const { getWords, getWordAtIndex } = require('../utils/matchUtils');
 // Do not reorder the matchers unless there is a reason to 
 // quicker potential matches are processed earlier in order to short circuit faster
 const matchers = [
+  require('./matchers/packMatcher'),
   require('./matchers/regexWordMatcher'),
   require('./matchers/commandMatcher'),
   require('./matchers/localVarMatcher'),
@@ -105,6 +106,11 @@ function response(match, context) {
   }
   if (match.id === matchType.COMPONENT.id && !context.word.value.includes(':')) {
     context.word.value = `${context.file.name}:${context.word.value}`;
+  }
+  if (match.id === matchType.OBJ.id && context.word.value.startsWith('cert_')) {
+    context.word.value = context.word.value.substring(5);
+    context.word.start = context.word.start + 5;
+    context.cert = true;
   }
   return { match: match, word: context.word.value, context: context };
 }

@@ -17,6 +17,7 @@ const dataTypeToMatchId = require('../resource/dataTypeToMatchId');
  */
 const monitoredFileTypes = new Set();
 function determineFileTypes() {
+  monitoredFileTypes.add('pack');
   Object.keys(matchType).forEach(matchTypeId => {
     const fileTypes = matchType[matchTypeId].fileTypes || [];
     for (const fileType of fileTypes) {

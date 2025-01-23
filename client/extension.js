@@ -6,7 +6,7 @@ const referenceProvider = require('./provider/referenceProvider');
 const cacheManager = require('./cache/cacheManager');
 const commands = require('./provider/vscodeCommands');
 
-const languages = ['runescript','locconfig','objconfig','npcconfig','dbtableconfig','dbrowconfig','paramconfig','structconfig','enumconfig','varpconfig','varnconfig','varsconfig','invconfig','seqconfig','spotanimconfig','mesanimconfig','idkconfig','huntconfig','constants','interface'];
+const languages = ['runescript','locconfig','objconfig','npcconfig','dbtableconfig','dbrowconfig','paramconfig','structconfig','enumconfig','varpconfig','varnconfig','varsconfig','invconfig','seqconfig','spotanimconfig','mesanimconfig','idkconfig','huntconfig','constants','interface','pack'];
 
 function activate(context) {
     // Register commands created by this extension
