@@ -2,11 +2,14 @@ const fs = require('fs').promises;
 const vscode = require('vscode');
 const matchType = require("../matching/matchType");
 const identifierCache = require('./identifierCache');
-const blockReferenceCache = require('./blockReferenceCache');
 const stringUtils = require('../utils/stringUtils');
 const { matchWords } = require('../matching/matchWord');
 const identifierFactory = require('../resource/identifierFactory');
 const { INFO_MATCHER, TRIGGER_LINE } = require('../enum/regex');
+const cacheUtils = require('../utils/cacheUtils');
+const returnBlockLinesCache = require('./returnBlockLinesCache');
+const switchStmtLinesCache = require('./switchStmtLinesCache');
+const dataTypeToMatchId = require('../resource/dataTypeToMatchId');
 
 /**
  * Builds the set of monitored file types, any file events with other file types will be ignored
@@ -94,16 +97,12 @@ async function getFiles() {
  * Parses the input file for identifiers, and caches them when found
  */
 async function parseFileAndCacheIdentifiers(uri) {
-  if (uri.path.endsWith('.if')) {
-    const fileSplit = uri.path.split('\\').pop().split('/').pop().split('.');
-    const location = new vscode.Location(uri, new vscode.Position(0, 0));
-    const identifier = identifierFactory.build(fileSplit[0], matchType.INTERFACE, location, null, []);
-    identifierCache.put(fileSplit[0], matchType.INTERFACE, identifier);
-  }
+  cacheIfFile(uri);
   const isRs2 = uri.path.endsWith('.rs2');
   const fileText = await fs.readFile(uri.path, "utf8");
   const lines = stringUtils.getLines(fileText);
   for (let line = 0; line < lines.length; line++) {
+    cacheSwitchStatementBlock(line, uri);
     const matches = (matchWords(lines[line], line, uri) || []).filter(match => match && match.match.cache); 
     if (matches.length > 0) {
       const text = {lines: null, start: 0};
@@ -114,13 +113,38 @@ async function parseFileAndCacheIdentifiers(uri) {
           const info = (line > 0) ? getInfo(lines[line - 1]) : null;
           const identifier = identifierFactory.build(match.word, match.match, location, info, text);
           identifierCache.put(match.word, match.match, identifier);
-          if (isRs2 && identifier.signature.returns.length > 0 && TRIGGER_LINE.test(lines[line])) {
-            blockReferenceCache.put(line + 1, match.word, match.match, uri);
-          }
+          cacheReturnBlock(identifier, line, match);
         } else {
           identifierCache.putReference(match.word, match.match, uri, line, match.context.word.start);
         }
       });
+    }
+  }
+
+  function cacheIfFile(uri) {
+    if (uri.path.endsWith('.if')) {
+      const fileSplit = uri.path.split('\\').pop().split('/').pop().split('.');
+      const location = new vscode.Location(uri, new vscode.Position(0, 0));
+      const identifier = identifierFactory.build(fileSplit[0], matchType.INTERFACE, location, null, []);
+      identifierCache.put(fileSplit[0], matchType.INTERFACE, identifier);
+    }
+  }
+
+  function cacheReturnBlock(identifier, line, match) {
+    if (isRs2 && identifier.signature.returns.length > 0 && TRIGGER_LINE.test(lines[line])) {
+      returnBlockLinesCache.put(line + 1, cacheUtils.resolveKey(match.word, match.match), uri);
+    }
+  }
+
+  function cacheSwitchStatementBlock(line, uri) {
+    if (isRs2) {
+      const switchSplit = lines[line].split("switch_");
+      if (switchSplit.length > 1) {
+        const switchMatchType = dataTypeToMatchId(switchSplit[1].split(/[ (]/)[0]);
+        if (switchMatchType !== matchType.UNKNOWN.id) {
+          switchStmtLinesCache.put(line + 1, switchMatchType, uri);
+        }
+      }
     }
   }
 }
@@ -146,7 +170,8 @@ function isValidFile(uri) {
  */
 function clearAll() {
   identifierCache.clear();
-  blockReferenceCache.clear();
+  returnBlockLinesCache.clear();
+  switchStmtLinesCache.clear();
 }
 
 /**
@@ -154,7 +179,8 @@ function clearAll() {
  */
 function clearFile(uri) {
   identifierCache.clearFile(uri);
-  blockReferenceCache.clearFile(uri);
+  returnBlockLinesCache.clearFile(uri);
+  switchStmtLinesCache.clearFile(uri);
 }
 
 module.exports = { rebuildAll, rebuildFile, clearFiles, renameFiles, createFiles, clearAll }

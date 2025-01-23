@@ -12,12 +12,12 @@ const specialCaseCommandKeys = ['val', 'param'];
  */
 function configMatcher(context) {
   // Check for config file declarations (i.e. declarations with [NAME])
-  if (CONFIG_DECLARATION.test(context.line)) {
+  if (CONFIG_DECLARATION.test(context.line.text)) {
     return declarationMatcher(context);
   }
 
   // Check if the line we are matching is a config line
-  if (CONFIG_LINE.test(context.line)) {
+  if (CONFIG_LINE.test(context.line.text)) {
     const configKey = context.words[0].value;
     // The config key itsself is selected, so check if it is a known config key or not (config key with info)
     if (context.word.index === 0) {

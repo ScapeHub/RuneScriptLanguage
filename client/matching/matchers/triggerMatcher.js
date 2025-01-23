@@ -10,7 +10,7 @@ function triggerMatcher(context) {
   if (context.file.type !== 'rs2') {
     return null;
   }
-  if (TRIGGER_LINE.test(context.line) && context.word.index <= 1) {
+  if (TRIGGER_LINE.test(context.line.text) && context.word.index <= 1) {
     const trigger = triggers[context.words[0].value.toLowerCase()];
     if (trigger) {
       if (context.word.index === 0) {

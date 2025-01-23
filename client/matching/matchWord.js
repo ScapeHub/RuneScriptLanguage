@@ -10,6 +10,7 @@ const matchers = [
   require('./matchers/prevCharMatcher'),
   require('./matchers/triggerMatcher'),
   require('./matchers/configMatcher'),
+  require('./matchers/switchCaseMatcher'),
   require('./matchers/parametersMatcher')
 ];
 
@@ -32,7 +33,7 @@ function matchWord(lineText, lineNum, uri, index) {
   const wordContext = {
     ...context,
     word: word,
-    index: index,
+    lineIndex: index,
     prevWord: (word.index === 0) ? undefined : context.words[word.index - 1],
     prevChar: lineText.charAt(word.start - 1),
     nextChar: lineText.charAt(word.end + 1),
@@ -53,7 +54,7 @@ function matchWords(lineText, lineNum, uri) {
     const wordContext = {
       ...context,
       word: context.words[i],
-      index: context.words[i].start,
+      lineIndex: context.words[i].start,
       prevWord: (i === 0) ? undefined : context.words[i-1],
       prevChar: lineText.charAt(context.words[i].start - 1),
       nextChar: lineText.charAt(context.words[i].end + 1),
@@ -73,8 +74,7 @@ function getBaseContext(lineText, lineNum, uri) {
   return {
     words: words,
     uri: uri,
-    line: lineText,
-    lineNum: lineNum,
+    line: {text: lineText, number: lineNum},
     file: {name: fileSplit[0], type: fileSplit[1]},
   }
 }

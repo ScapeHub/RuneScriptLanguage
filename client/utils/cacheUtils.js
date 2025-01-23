@@ -17,13 +17,4 @@ function decodeReference(uri, encodedValue) {
   return (split.length !== 2) ? null : new vscode.Location(uri, new vscode.Position(Number(split[0]), Number(split[1])));
 }
 
-function encodeBlockReference(startLine, identifierKey) {
-  return `${startLine}|${identifierKey}`;
-}
-
-function decodeBlockReference(encodedValue) {
-  const split = encodedValue.split('|');
-  return (split.length !== 2) ? null : { startLine: Number(split[0]), identifierKey: split[1] };
-}
-
-module.exports = { resolveKey, resolveFileKey, encodeReference, decodeReference, encodeBlockReference, decodeBlockReference };
+module.exports = { resolveKey, resolveFileKey, encodeReference, decodeReference };

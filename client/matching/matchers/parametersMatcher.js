@@ -1,7 +1,7 @@
 const matchType = require('../matchType');
 const identifierCache = require('../../cache/identifierCache');
 const { reference, getWordAtIndex } = require("../../utils/matchUtils");
-const blockReferenceCache = require('../../cache/blockReferenceCache');
+const returnBlockLinesCache = require('../../cache/returnBlockLinesCache');
 
 /**
  * Looks for matches of values inside of parenthesis
@@ -16,10 +16,10 @@ function parametersMatcher(context) {
     return null;
   }
   const name = identifierName.value;
-  const prev = context.line.charAt(identifierName.start - 1);
+  const prev = context.line.text.charAt(identifierName.start - 1);
   let identifier;
   if (name === 'return') {
-    const blockIdentifierKey = blockReferenceCache.get(context.lineNum, context.uri);
+    const blockIdentifierKey = returnBlockLinesCache.get(context.line.number, context.uri);
     if (blockIdentifierKey) {
       identifier = identifierCache.getByKey(blockIdentifierKey);
       if (identifier && identifier.signature.returns.length > paramIndex) {
@@ -47,11 +47,11 @@ function parametersMatcher(context) {
 }
 
 function parseForIdentifierNameAndParamIndex(context) {
-  const str = context.line;
+  const str = context.line.text;
   let isInString = false;
   let isInParams = false;
   let paramIndex = 0;
-  for (let i = context.index; i >= 0; i--) {
+  for (let i = context.lineIndex; i >= 0; i--) {
     if (isInString) {
       if (str.charAt(i) === '"') isInString = false;
       continue;

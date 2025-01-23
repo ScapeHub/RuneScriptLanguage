@@ -10,7 +10,8 @@ const regex = {
   CONFIG_LINE: /^\w+=.+$/,
   CONFIG_DECLARATION: /\[\w+\]/,
   TRIGGER_LINE: /\[\w+,(\.)?\w+(:\w+)?\]/,
-  INFO_MATCHER: /\/\/[ ]{0,1}(desc|info):(.+)/
+  INFO_MATCHER: /\/\/[ ]{0,1}(desc|info):(.+)/,
+  SWITCH_CASE: /\s*case.+/
 }
 
 module.exports = regex;
