@@ -24,7 +24,7 @@ function activate(context) {
     vscode.workspace.onDidRenameFiles(filesRenamedEvent => cacheManager.renameFiles(filesRenamedEvent.files));
     vscode.workspace.onDidCreateFiles(filesCreatedEvent => cacheManager.createFiles(filesCreatedEvent.files));
 
-    // Register hover, definition, and reference providers
+    // Register hover, rename, definition, and reference providers
     for (const language of languages) {
         vscode.languages.registerHoverProvider(language, hoverProvider(context));
         vscode.languages.registerRenameProvider(language, renameProvider);

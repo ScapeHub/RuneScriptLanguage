@@ -12,7 +12,7 @@ function commandMatcher(context) {
       return declaration(matchType.COMMAND);
     }
     if (command.signature.params.length > 0 && context.nextChar !== '('){
-      return matchType.UNKNOWN;
+      return null;
     } 
     return reference(matchType.COMMAND);
   }

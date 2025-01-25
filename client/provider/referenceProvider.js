@@ -3,6 +3,7 @@ const { matchWordFromDocument } = require('../matching/matchWord');
 const identifierCache = require('../cache/identifierCache');
 const cacheUtils = require('../utils/cacheUtils');
 const matchType = require('../matching/matchType');
+const { parseScriptBlock } = require('../utils/localVarUtils');
 
 const referenceProvider = {
   async provideReferences(document, position) {
@@ -10,6 +11,12 @@ const referenceProvider = {
     const { match, word } = matchWordFromDocument(document, position)
     if (!match || match.noop || match.isHoverOnly) {
       return null;
+    }
+
+    // Local vars handled separately
+    if (match.id === matchType.LOCAL_VAR.id) {
+      const { references } = parseScriptBlock(document, position, `$${word}`);
+      return references.map(range => new vscode.Location(document.uri, range));
     }
 
     // Get the identifier from the cache

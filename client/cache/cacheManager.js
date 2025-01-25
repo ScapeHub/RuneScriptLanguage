@@ -116,6 +116,7 @@ async function parseFileAndCacheIdentifiers(uri) {
           } 
           const identifier = identifierFactory.build(match.word, match.match, location, info, text);
           identifierCache.put(match.word, match.match, identifier);
+          identifierCache.putReference(match.word, match.match, uri, line, match.context.word.start);
           cacheReturnBlock(identifier, line, match);
         } else {
           const id = match.context.cert ? undefined : match.context.packId;

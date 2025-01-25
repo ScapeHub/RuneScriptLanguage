@@ -64,21 +64,19 @@ const hoverProvider = function(context) {
 }
 
 function appendLocalVarHoverText(document, position, word, match, content) {
-  if (match.declaration === false) {
-    const fileText = document.getText(new vscode.Range(new vscode.Position(0, 0), position));
-    const foundLocalVar = localVarUtils.findLocalVar(fileText, word);
-    if (!foundLocalVar) {
-      expectedIdentifierMessage(word, match, content);
+  const fileText = document.getText(new vscode.Range(new vscode.Position(0, 0), position.translate(1, 0)));
+  const foundLocalVar = localVarUtils.findLocalVar(fileText, word);
+  if (!foundLocalVar) {
+    expectedIdentifierMessage(word, match, content);
+  } else {
+    appendTitle(word, 'rs2', match.id, content);
+    const isDef = fileText.substring(Math.max(foundLocalVar.index - 4, 0), foundLocalVar.index) === "def_";
+    if (isDef) {
+      const line = stringUtils.getLineText(fileText.substring(foundLocalVar.index - 4));
+      content.appendCodeblock(line.substring(line.indexOf('def_') + 4, line.indexOf(word) + word.length), 'runescript');
     } else {
-      appendTitle(word, 'rs2', match.id, content);
-      const isDef = fileText.substring(Math.max(foundLocalVar.index - 4, 0), foundLocalVar.index) === "def_";
-      if (isDef) {
-        const line = stringUtils.getLineText(fileText.substring(foundLocalVar.index - 4));
-        content.appendCodeblock(line.substring(0, line.indexOf(";")), 'runescript');
-      } else {
-        const lineText = stringUtils.getLineText(fileText.substring(foundLocalVar.index));
-        content.appendCodeblock(`parameter: ${lineText.substring(0, lineText.indexOf(word) + word.length)}`, 'runescript');
-      }
+      const lineText = stringUtils.getLineText(fileText.substring(foundLocalVar.index));
+      content.appendCodeblock(`${lineText.substring(0, lineText.indexOf(word) + word.length)} (script parameter)`, 'runescript');
     }
   }
 }
