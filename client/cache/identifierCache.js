@@ -1,3 +1,4 @@
+const { buildRef } = require('../resource/identifierFactory');
 const cacheUtils = require('../utils/cacheUtils');
 
 /**
@@ -51,7 +52,7 @@ function putReference(name, match, uri, lineNum, index, packId) {
     return null;
   }
   if (!identifierCache[key]) {
-    identifierCache[key] = {references: {}};
+    identifierCache[key] = buildRef(name, match);
   } 
   const fileReferences = identifierCache[key].references[fileKey] || new Set();
   fileReferences.add(cacheUtils.encodeReference(lineNum, index));

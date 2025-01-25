@@ -18,145 +18,147 @@ all the necessary data it needs for finding declarations, building hover texts, 
 */
 const matchType = {
   LOCAL_VAR: {
-    id: 'LOCAL_VAR', types: [], fileTypes: ['rs2'], cache: false,
+    id: 'LOCAL_VAR', types: [], fileTypes: ['rs2'], cache: false, allowRename: true, 
   },
   GLOBAL_VAR: {
-    id: 'GLOBAL_VAR', types: [], fileTypes: ['varp', 'vars', 'varn'], cache: true, 
+    id: 'GLOBAL_VAR', types: [], fileTypes: ['varp', 'vars', 'varn'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'varpconfig'},
     postProcessor: postProcessors.dataTypePostProcessor
   },
   CONSTANT: {
-    id: 'CONSTANT', types: [], fileTypes: ['constant'], cache: true,
+    id: 'CONSTANT', types: [], fileTypes: ['constant'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'constants', [BLOCK_SKIP_LINES]: 0},
   },
   LABEL: {
-    id: 'LABEL', types: ['label'], fileTypes: ['rs2'], cache: true,
+    id: 'LABEL', types: ['label'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
   },
   PROC: {
-    id: 'PROC', types: ['proc'], fileTypes: ['rs2'], cache: true,
+    id: 'PROC', types: ['proc'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
   },
   TIMER: {
-    id: 'TIMER', types: ['timer'], fileTypes: ['rs2'], cache: true,
+    id: 'TIMER', types: ['timer'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
   },
   SOFTTIMER: {
-    id: 'SOFTTIMER', types: ['softtimer'], fileTypes: ['rs2'], cache: true,
+    id: 'SOFTTIMER', types: ['softtimer'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
   },
   QUEUE: {
-    id: 'QUEUE', types: ['queue'], fileTypes: ['rs2'], cache: true,
+    id: 'QUEUE', types: ['queue'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
     postProcessor: postProcessors.queuePostProcessor
   },
   SEQ: {
-    id: 'SEQ', types: ['seq'], fileTypes: ['seq'], cache: true,
+    id: 'SEQ', types: ['seq'], fileTypes: ['seq'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'seqconfig'},
   },
   SPOTANIM: {
-    id: 'SPOTANIM', types: ['spotanim'], fileTypes: ['spotanim'], cache: true,
+    id: 'SPOTANIM', types: ['spotanim'], fileTypes: ['spotanim'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'spotanimconfig'},
   },
   HUNT: {
-    id: 'HUNT', types: ['hunt'], fileTypes: ['hunt'], cache: true,
+    id: 'HUNT', types: ['hunt'], fileTypes: ['hunt'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'huntconfig', [CONFIG_INCLUSIONS]: ['type']},
   },
   LOC: {
-    id: 'LOC', types: ['loc'], fileTypes: ['loc'], cache: true,
+    id: 'LOC', types: ['loc'], fileTypes: ['loc'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'locconfig', [CONFIG_INCLUSIONS]: ['name', 'desc', 'category']},
   },
   NPC: {
-    id: 'NPC', types: ['npc'], fileTypes: ['npc'], cache: true,
+    id: 'NPC', types: ['npc'], fileTypes: ['npc'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'npcconfig', [CONFIG_INCLUSIONS]: ['name', 'desc', 'category']},
   },
   OBJ: {
-    id: 'OBJ', types: ['namedobj', 'obj'], fileTypes: ['obj'], cache: true,
+    id: 'OBJ', types: ['namedobj', 'obj'], fileTypes: ['obj'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'objconfig', [CONFIG_INCLUSIONS]: ['name', 'desc', 'category']},
   },
   INV: {
-    id: 'INV', types: ['inv'], fileTypes: ['inv'], cache: true,
+    id: 'INV', types: ['inv'], fileTypes: ['inv'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'invconfig', [CONFIG_INCLUSIONS]: ['scope', 'size']},
   },
   ENUM: {
-    id: 'ENUM', types: ['enum'], fileTypes: ['enum'], cache: true,
+    id: 'ENUM', types: ['enum'], fileTypes: ['enum'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'enumconfig', [CONFIG_INCLUSIONS]: ['inputtype', 'outputtype']},
     postProcessor: postProcessors.enumPostProcessor
   },
   DBCOLUMN: {
-    id: 'DBCOLUMN', types: ['dbcolumn'], fileTypes: ['dbrow'], cache: true,
+    id: 'DBCOLUMN', types: ['dbcolumn'], fileTypes: ['dbrow'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [], [REFERENCE_HOVER_ITEMS]: [], [LANGUAGE]: 'dbrowconfig'},
   },
   DBROW: {
-    id: 'DBROW', types: ['dbrow'], fileTypes: ['dbrow'], cache: true,
+    id: 'DBROW', types: ['dbrow'], fileTypes: ['dbrow'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbrowconfig', [CONFIG_INCLUSIONS]: ['table']},
   },
   DBTABLE: {
-    id: 'DBTABLE', types: ['dbtable'], fileTypes: ['dbtable'], cache: true,
+    id: 'DBTABLE', types: ['dbtable'], fileTypes: ['dbtable'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbtableconfig'},
   },
   INTERFACE: {
-    id: 'INTERFACE', types: ['interface'], fileTypes: ['if'], cache: true,
-    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE], [LANGUAGE]: 'interface'},
+    id: 'INTERFACE', types: ['interface'], fileTypes: ['if'], cache: true, allowRename: false, referenceOnly: true, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'interface'},
+    postProcessor: postProcessors.fileNamePostProcessor
   },
   COMPONENT: {
-    id: 'COMPONENT', types: ['component'], fileTypes: ['if'], cache: true,
+    id: 'COMPONENT', types: ['component'], fileTypes: ['if'], cache: true, allowRename: false, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'interface'},
     postProcessor: postProcessors.componentPostProcessor
   },
   PARAM: {
-    id: 'PARAM', types: ['param'], fileTypes: ['param'], cache: true,
+    id: 'PARAM', types: ['param'], fileTypes: ['param'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'paramconfig'},
     postProcessor: postProcessors.dataTypePostProcessor
   },
   COMMAND: {
-    id: 'COMMAND', types: [], fileTypes: ['rs2'], cache: true,
+    id: 'COMMAND', types: [], fileTypes: ['rs2'], cache: true, allowRename: false, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
   },
   SYNTH: {
-    id: 'SOUND_SYNTH', types: ['synth'], fileTypes: [], cache: true,
-    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
+    id: 'SOUND_SYNTH', types: ['synth'], fileTypes: ['synth'], cache: true, allowRename: false, referenceOnly: true, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
+    postProcessor: postProcessors.fileNamePostProcessor
   },
   WALKTRIGGER: {
-    id: 'WALKTRIGGER', types: ['walktrigger'], fileTypes: ['rs2'], cache: true,
+    id: 'WALKTRIGGER', types: ['walktrigger'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
   },
   IDK: {
-    id: 'IDK', types: ['idk', 'idkit'], fileTypes: ['idk'], cache: true,
+    id: 'IDK', types: ['idk', 'idkit'], fileTypes: ['idk'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'idkconfig'},
   },
   MESANIM: {
-    id: 'MESANIM', types: ['mesanim'], fileTypes: ['mesanim'], cache: true,
+    id: 'MESANIM', types: ['mesanim'], fileTypes: ['mesanim'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'mesanimconfig'},
   },
   STRUCT: {
-    id: 'STRUCT', types: ['struct'], fileTypes: ['struct'], cache: true,
+    id: 'STRUCT', types: ['struct'], fileTypes: ['struct'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'structconfig'},
   },
   // Hover only match types that are only used for displaying hover displays (no finding references/declarations)
   // Useful for terminating word searches early when detected. Postprocessing can be done on these.
   // Specify referenceConfig to select which displayItems should be shown on hover.
   COORDINATES: {
-    id: 'COORDINATES', types: [], hoverOnly: true, cache: false,
+    id: 'COORDINATES', types: [], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, VALUE]},
     postProcessor: postProcessors.coordPostProcessor
   },
   CONFIG_KEY: {
-    id: 'CONFIG_KEY', types: [], hoverOnly: true, cache: false,
+    id: 'CONFIG_KEY', types: [], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
     postProcessor: postProcessors.configKeyPostProcessor
   },
   TRIGGER: {
-    id: 'TRIGGER', types: [], hoverOnly: true, cache: false,
+    id: 'TRIGGER', types: [], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
     postProcessor: postProcessors.triggerPostProcessor
   },
   STAT: { 
-    id: 'STAT', types: ['stat'], hoverOnly: true, cache: false,
+    id: 'STAT', types: ['stat'], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
   },
   CATEGORY_TRIGGER: {
-    id: 'CATEGORY_TRIGGER', types: [], hoverOnly: true, cache: false,
+    id: 'CATEGORY_TRIGGER', types: [], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, VALUE]},
     postProcessor: postProcessors.categoryTriggerPostProcessor
   },

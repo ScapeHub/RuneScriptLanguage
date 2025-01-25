@@ -32,16 +32,35 @@ function build(name, match, location, info = null, text = {lines: [], start: 0})
   if (info) identifier.info = info;
   addExtraData(identifier, match.extraData);
   process(identifier);
+  cleanup(identifier);
+  return identifier;
+}
+
+function buildRef(name, match) {
+  const identifier = {
+    name: name,
+    match: match,
+    references: {},
+    fileType: match.fileTypes[0] || 'rs2',
+    language: hoverConfigResolver.resolve(LANGUAGE, match),
+  }
+  if (match.referenceOnly) {
+    addExtraData(identifier, match.extraData);
+    process(identifier);
+  }
+  cleanup(identifier);
   return identifier;
 }
 
 function process(identifier) {
   // Process specififed display items
-  const hoverDisplayItems = hoverConfigResolver.resolveAllHoverItems(identifier.match);
-  for (const hoverDisplayItem of hoverDisplayItems) {
-    switch(hoverDisplayItem) {
-      case SIGNATURE: processSignature(identifier); break;
-      case CODEBLOCK: processCodeBlock(identifier); break;
+  if (identifier.text) {
+    const hoverDisplayItems = hoverConfigResolver.resolveAllHoverItems(identifier.match);
+    for (const hoverDisplayItem of hoverDisplayItems) {
+      switch(hoverDisplayItem) {
+        case SIGNATURE: processSignature(identifier); break;
+        case CODEBLOCK: processCodeBlock(identifier); break;
+      }
     }
   }
 
@@ -49,8 +68,9 @@ function process(identifier) {
   if (identifier.match.postProcessor) {
     identifier.match.postProcessor(identifier);
   }
+}
 
-  // Cleanup now unneeded data to reduce identifier size
+function cleanup(identifier) {
   identifier.matchId = identifier.match.id;
   delete identifier.match;
   delete identifier.text;
@@ -112,4 +132,4 @@ function addExtraData(identifier, extraData) {
   Object.keys(extraData).forEach(key => identifier.extraData[key] = extraData[key]);
 }
 
-module.exports = { build };
+module.exports = { build, buildRef };

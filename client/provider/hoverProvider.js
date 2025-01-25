@@ -38,15 +38,21 @@ const hoverProvider = function(context) {
         return null;
       }
 
-      // Build hover text based on identifier data
+      // Get/Build identifier object for the match found
       const identifier = getIdentifier(word, match, document, position);
-      if (!match.declaration && (!identifier || !identifier.declaration)) {
-        expectedIdentifierMessage(word, match, content);
-        return new vscode.Hover(content);
-      }
-      if (!identifier || identifier.hideDisplay) {
+
+      // No identifier or hideDisplay property is set, then there is nothing to display
+      if (!identifier || identifier.hideDisplay) { 
         return null;
       }
+
+      // Match type is a reference, but it has no declaration => display a warning message "expected identifier"
+      if (!match.declaration && !match.referenceOnly && !identifier.declaration) { 
+        expectedIdentifierMessage(word, match, content);   
+        return new vscode.Hover(content);
+      }
+
+      // Append the registered hoverDisplayItems defined in the matchType for the identifier
       appendTitle(identifier.name, identifier.fileType, identifier.matchId, content, identifier.id, matchContext.cert);
       appendInfo(identifier, hoverDisplayItems, content);
       appendValue(identifier, hoverDisplayItems, content);
@@ -123,10 +129,9 @@ function appendBody(text, content) {
 }
 
 function getIdentifier(word, match, document, position) {
-  if (match.hoverOnly) {
-    return identifierFactory.build(word, match, new vscode.Location(document.uri, position));
-  }
-  return identifierCache.get(word, match, match.declaration ? document.uri : null);
+  return (match.hoverOnly) ?
+    identifierFactory.build(word, match, new vscode.Location(document.uri, position)) :
+    identifierCache.get(word, match, match.declaration ? document.uri : null);
 }
 
 module.exports = hoverProvider;

@@ -12,9 +12,18 @@ function encodeReference(line, index) {
   return `${line}|${index}`;
 }
 
-function decodeReference(uri, encodedValue) {
+function decodeReferenceToLocation(uri, encodedValue) {
   const split = encodedValue.split('|');
   return (split.length !== 2) ? null : new vscode.Location(uri, new vscode.Position(Number(split[0]), Number(split[1])));
 }
 
-module.exports = { resolveKey, resolveFileKey, encodeReference, decodeReference };
+function decodeReferenceToRange(wordLength, encodedValue) {
+  const split = encodedValue.split('|');
+  if (split.length !== 2) {
+    return null;
+  }
+  const startPosition = new vscode.Position(Number(split[0]), Number(split[1]));
+  return new vscode.Range(startPosition, startPosition.translate(0, wordLength));
+}
+
+module.exports = { resolveKey, resolveFileKey, encodeReference, decodeReferenceToLocation, decodeReferenceToRange };

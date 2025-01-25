@@ -57,7 +57,12 @@ const columnPostProcessor = function(identifier) {
   identifier.name = split[1];
 }
 
+const fileNamePostProcessor = function(identifier) {
+  identifier.info = `Refers to the file <b>${identifier.name}.${identifier.fileType}</b>`;
+}
+
 module.exports = { 
   queuePostProcessor, coordPostProcessor, enumPostProcessor, dataTypePostProcessor, configKeyPostProcessor, 
-  triggerPostProcessor, categoryTriggerPostProcessor, componentPostProcessor, columnPostProcessor
+  triggerPostProcessor, categoryTriggerPostProcessor, componentPostProcessor, columnPostProcessor,
+  fileNamePostProcessor
 };

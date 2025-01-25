@@ -18,7 +18,7 @@ const dataTypeToMatchId = require('../resource/dataTypeToMatchId');
 const monitoredFileTypes = new Set();
 function determineFileTypes() {
   monitoredFileTypes.add('pack');
-  Object.keys(matchType).forEach(matchTypeId => {
+  Object.keys(matchType).filter(mt => !mt.referenceOnly).forEach(matchTypeId => {
     const fileTypes = matchType[matchTypeId].fileTypes || [];
     for (const fileType of fileTypes) {
       monitoredFileTypes.add(fileType);
@@ -98,7 +98,6 @@ async function getFiles() {
  * Parses the input file for identifiers, and caches them when found
  */
 async function parseFileAndCacheIdentifiers(uri) {
-  cacheIfFile(uri);
   const isRs2 = uri.path.endsWith('.rs2');
   const fileText = await fs.readFile(uri.path, "utf8");
   const lines = stringUtils.getLines(fileText);
@@ -123,15 +122,6 @@ async function parseFileAndCacheIdentifiers(uri) {
           identifierCache.putReference(match.word, match.match, uri, line, match.context.word.start, id);
         }
       });
-    }
-  }
-
-  function cacheIfFile(uri) {
-    if (uri.path.endsWith('.if')) {
-      const fileSplit = uri.path.split('\\').pop().split('/').pop().split('.');
-      const location = new vscode.Location(uri, new vscode.Position(0, 0));
-      const identifier = identifierFactory.build(fileSplit[0], matchType.INTERFACE, location, null, []);
-      identifierCache.put(fileSplit[0], matchType.INTERFACE, identifier);
     }
   }
 

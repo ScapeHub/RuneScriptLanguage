@@ -14,7 +14,7 @@ const gotoDefinitionProvider = {
 
     // If we are already on a declaration, there is nowhere to goto. Returning current location
     // indicates to vscode that we instead want to try doing "find references"
-    if (match.declaration) {
+    if (match.declaration || match.referenceOnly) {
       return new vscode.Location(document.uri, position);
     }
 

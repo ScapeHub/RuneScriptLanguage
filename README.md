@@ -13,8 +13,8 @@
 * Goto definitions (ctrl+click)
 * Info displayed on hover
 * Find all references
+* Rename symbol
 
 #### Coming soon™
 
-* Rename symbol accross files
 * Autocomplete suggestions when typing procs, etc...
