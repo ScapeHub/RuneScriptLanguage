@@ -24,20 +24,14 @@ function activate(context) {
     vscode.workspace.onDidRenameFiles(filesRenamedEvent => cacheManager.renameFiles(filesRenamedEvent.files));
     vscode.workspace.onDidCreateFiles(filesCreatedEvent => cacheManager.createFiles(filesCreatedEvent.files));
 
-    // Register hover, rename, definition, and reference providers
+    // Register providers (hover, rename, recolor, definition, reference)
     for (const language of languages) {
         vscode.languages.registerHoverProvider(language, hoverProvider(context));
         vscode.languages.registerRenameProvider(language, renameProvider);
+        if (language.endsWith('config')) vscode.languages.registerColorProvider(language, recolorProvider);
         context.subscriptions.push(vscode.languages.registerDefinitionProvider(language, definitionProvider));
         context.subscriptions.push(vscode.languages.registerReferenceProvider(language, referenceProvider));
     }
-
-    // Register color providers 
-    vscode.languages.registerColorProvider('locconfig', recolorProvider);
-    vscode.languages.registerColorProvider('npcconfig', recolorProvider);
-    vscode.languages.registerColorProvider('objconfig', recolorProvider);
-    vscode.languages.registerColorProvider('spotanimconfig', recolorProvider);
-    vscode.languages.registerColorProvider('idkconfig', recolorProvider);
 }
 
 function deactivate() {

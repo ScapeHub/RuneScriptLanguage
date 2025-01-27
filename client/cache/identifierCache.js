@@ -11,7 +11,7 @@ var identifierCache = {};
 /**
  * The fileToIdentiferMap keeps track of all identifiers and references in a file
  * This is used for updating the cache as necessary when a file is modified
- * fileToIdentiferMap = {filePath: {declarations: Set(), references: Set()}}
+ * fileToIdentiferMap = {filePath: {declarations: Set(): identifierKey, references: Set(): identifierKey}}
  */
 var fileToIdentifierMap = {};
 
@@ -70,16 +70,28 @@ function clearFile(uri) {
   const fileKey = cacheUtils.resolveFileKey(uri);
   const identifiersInFile = fileToIdentifierMap[fileKey] || { declarations: new Set(), references: new Set() };
   identifiersInFile.references.forEach(key => {
-    if (identifierCache[key] && identifierCache[key].references[fileKey]) {
-      delete identifierCache[key].references[fileKey];
+    if (identifierCache[key]) {
+      // Delete references to the cleared file from every identifier which referenced the file
+      if (identifierCache[key].references[fileKey]) {
+        delete identifierCache[key].references[fileKey];
+      }
+      // Cleanup/Delete identifiers without a declaration who no longer have any references
+      if (Object.keys(identifierCache[key].references).length === 0 && !identifierCache[key].declaration) {
+        delete identifierCache[key];
+      }
     }
   })
   identifiersInFile.declarations.forEach(key => {
-    const orphanedReferences = identifierCache[key].references;
     if (identifierCache[key]) {
-      delete identifierCache[key];
+      // If the identifier has orphaned references, then we only delete the declaration and keep the identifier w/references
+      // Otherwise, we delete the entire identifier (no declaration and no references => no longer exists in any capacity)
+      const hasOrphanedRefs = Object.keys(identifierCache[key].references).length > 0;
+      if (hasOrphanedRefs) {
+        delete identifierCache[key].declaration;
+      } else {
+        delete identifierCache[key];
+      }
     }
-    identifierCache[key] = {references: orphanedReferences};
   });
   delete fileToIdentifierMap[fileKey];
 }

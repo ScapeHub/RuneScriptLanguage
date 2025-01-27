@@ -1,6 +1,7 @@
 const regex = {
   COORD: /(\d+_){4}\d+/,
   COLOR: /\d{6}/,
+  RECOLOR: /(recol[1-6][sd])=(\d+)/g,
   NUMBER: /^\d+.?\d+$/,
   END_OF_BLOCK: /(\r\n|\r|\n)(\[.+|val=.+|\^.+|\d+=.+)(?:$|(\r\n|\r|\n))/,
   END_OF_BLOCK_LINE: /^(\[|\^|\d+=)/,
