@@ -1,5 +1,5 @@
 const matchType = require('./matchType');
-const { getWords, getWordAtIndex } = require('../utils/matchUtils');
+const { getWordAtIndex, getBaseContext } = require('../utils/matchUtils');
 
 // Do not reorder the matchers unless there is a reason to 
 // quicker potential matches are processed earlier in order to short circuit faster
@@ -63,21 +63,6 @@ function matchWords(lineText, lineNum, uri) {
     matches.push(match(wordContext));
   }
   return matches;
-}
-
-/**
- * Context items shared by both matchWord and matchWords
- */ 
-function getBaseContext(lineText, lineNum, uri) {
-  lineText = lineText.split('//')[0]; // Ignore anything after a comment
-  const words = getWords(lineText);
-  const fileSplit = uri.path.split('\\').pop().split('/').pop().split('.');
-  return {
-    words: words,
-    uri: uri,
-    line: {text: lineText, number: lineNum},
-    file: {name: fileSplit[0], type: fileSplit[1]},
-  }
 }
 
 /**

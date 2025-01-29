@@ -28,7 +28,7 @@ function configMatcher(context) {
       return handleSpecialCases(configKey, context);
     }
     // Otherwise, if the second word is the selected word (word after '=') then handle remaining known keys/regex keys
-    if (context.word.index === 1) {
+    if (context.word.index >= 1) {
       const configMatch = configKeys[configKey];
       return (configMatch) ? reference(configMatch.match) : checkRegexConfigKeys(configKey, context);
     }

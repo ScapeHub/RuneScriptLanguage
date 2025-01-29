@@ -5,10 +5,6 @@ const { getLineText } = require('../utils/stringUtils');
 // Post processors are used for any additional post modification needed for a matchType, after an identifier has been built  
 // postProcessors must be a function which takes indentifier as an input, and directly modifies that identifier as necessary 
 
-const queuePostProcessor = function(identifier) {
-  identifier.signature.params.unshift({}, {}); // Custom queue params start at index 2
-}
-
 const coordPostProcessor = function(identifier) {
   const coordinates = identifier.name.split('_');
   const xCoord = Number(coordinates[1] << 6) + Number(coordinates[3]);
@@ -62,7 +58,7 @@ const fileNamePostProcessor = function(identifier) {
 }
 
 module.exports = { 
-  queuePostProcessor, coordPostProcessor, enumPostProcessor, dataTypePostProcessor, configKeyPostProcessor, 
+  coordPostProcessor, enumPostProcessor, dataTypePostProcessor, configKeyPostProcessor, 
   triggerPostProcessor, categoryTriggerPostProcessor, componentPostProcessor, columnPostProcessor,
   fileNamePostProcessor
 };

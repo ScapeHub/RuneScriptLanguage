@@ -48,7 +48,6 @@ const matchType = {
   QUEUE: {
     id: 'QUEUE', types: ['queue'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
-    postProcessor: postProcessors.queuePostProcessor
   },
   SEQ: {
     id: 'SEQ', types: ['seq'], fileTypes: ['seq'], cache: true, allowRename: true, 

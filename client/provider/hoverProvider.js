@@ -1,14 +1,14 @@
 const vscode = require('vscode');
-const path = require('path');
 const stringUtils = require('../utils/stringUtils');
 const localVarUtils = require('../utils/localVarUtils');
 const matchType = require('../matching/matchType');
 const identifierCache = require('../cache/identifierCache');
 const identifierFactory = require('../resource/identifierFactory');
-const { TITLE, INFO, VALUE, SIGNATURE, CODEBLOCK } = require('../enum/hoverDisplayItems');
 const { matchWordFromDocument } = require('../matching/matchWord');
 const { resolve } = require('../resource/hoverConfigResolver');
 const { DECLARATION_HOVER_ITEMS, REFERENCE_HOVER_ITEMS } = require('../enum/hoverConfigOptions');
+const { markdownBase, appendTitle, appendInfo, appendValue, appendSignature, 
+  appendCodeBlock, expectedIdentifierMessage, appendLocalVarText } = require('../utils/markdownUtils');
 
 const hoverProvider = function(context) {
   return {
@@ -19,17 +19,13 @@ const hoverProvider = function(context) {
         return null;
       }
 
-      // Setup the hover text markdown object
-      const content = new vscode.MarkdownString();
-      content.supportHtml = true;
-      content.isTrusted = true;
-      content.supportThemeIcons = true;
-      content.baseUri = vscode.Uri.file(path.join(context.extensionPath, 'icons', path.sep)); 
+      // Setup the hover text markdown content object
+      const markdown = markdownBase(context);
 
       // Local vars are handled differently than the rest
       if (match.id === matchType.LOCAL_VAR.id) {
-        appendLocalVarHoverText(document, position, word, match, content);
-        return new vscode.Hover(content);
+        appendLocalVarHoverText(document, position, word, match, markdown);
+        return new vscode.Hover(markdown);
       }
 
       // If no config found, or no items to display then exit early
@@ -48,82 +44,37 @@ const hoverProvider = function(context) {
 
       // Match type is a reference, but it has no declaration => display a warning message "expected identifier"
       if (!match.declaration && !match.referenceOnly && !identifier.declaration) { 
-        expectedIdentifierMessage(word, match, content);   
-        return new vscode.Hover(content);
+        expectedIdentifierMessage(word, match, markdown);   
+        return new vscode.Hover(markdown);
       }
 
       // Append the registered hoverDisplayItems defined in the matchType for the identifier
-      appendTitle(identifier.name, identifier.fileType, identifier.matchId, content, identifier.id, matchContext.cert);
-      appendInfo(identifier, hoverDisplayItems, content);
-      appendValue(identifier, hoverDisplayItems, content);
-      appendSignature(identifier, hoverDisplayItems, content);
-      appendCodeBlock(identifier, hoverDisplayItems, content);
-      return new vscode.Hover(content);
+      appendTitle(identifier.name, identifier.fileType, identifier.matchId, markdown, identifier.id, matchContext.cert);
+      appendInfo(identifier, hoverDisplayItems, markdown);
+      appendValue(identifier, hoverDisplayItems, markdown);
+      appendSignature(identifier, hoverDisplayItems, markdown);
+      appendCodeBlock(identifier, hoverDisplayItems, markdown);
+      return new vscode.Hover(markdown);
     }
   };
 }
 
-function appendLocalVarHoverText(document, position, word, match, content) {
+function appendLocalVarHoverText(document, position, word, match, markdown) {
   const fileText = document.getText(new vscode.Range(new vscode.Position(0, 0), position.translate(1, 0)));
   const foundLocalVar = localVarUtils.findLocalVar(fileText, word);
   if (!foundLocalVar) {
-    expectedIdentifierMessage(word, match, content);
+    expectedIdentifierMessage(word, match, markdown);
   } else {
-    appendTitle(word, 'rs2', match.id, content);
+    appendTitle(word, 'rs2', match.id, markdown);
     const isDef = fileText.substring(Math.max(foundLocalVar.index - 4, 0), foundLocalVar.index) === "def_";
     if (isDef) {
       const line = stringUtils.getLineText(fileText.substring(foundLocalVar.index - 4));
-      content.appendCodeblock(line.substring(line.indexOf('def_') + 4, line.indexOf(word) + word.length), 'runescript');
+      appendLocalVarText(line.substring(line.indexOf('def_') + 4, line.indexOf(word) + word.length), markdown);
     } else {
       const lineText = stringUtils.getLineText(fileText.substring(foundLocalVar.index));
-      content.appendCodeblock(`${lineText.substring(0, lineText.indexOf(word) + word.length)} (script parameter)`, 'runescript');
+      appendLocalVarText(`${lineText.substring(0, lineText.indexOf(word) + word.length)} (script parameter)`, markdown);
     }
   }
-}
-
-function expectedIdentifierMessage(word, match, content) {
-  content.appendMarkdown(`<img src="warning.png">&ensp;<b>${match.id}</b>&ensp;<i>${word}</i> not found`);
-}
-
-function appendTitle(name, type, matchId, content, id, isCert) {
-  if (isCert && id) {
-    name = `${name} (cert) [${Number(id) + 1}]`;
-  } else if (id) {
-    name = `${name} [${id}]`;
-  }
-  content.appendMarkdown(`<img src="${type}.png">&ensp;<b>${matchId}</b>&ensp;${name}`);
-}
-
-function appendInfo(identifier, displayItems, content) {
-  if (displayItems.includes(INFO) && identifier.info) {
-    appendBody(`<i>${identifier.info}</i>`, content);
-  }
-}
-
-function appendValue(identifier, displayItems, content) {
-  if (displayItems.includes(VALUE) && identifier.value) {
-    appendBody(`${identifier.value}`, content);
-  }
-}
-
-function appendSignature(identifier, displayItems, content) {
-  if (displayItems.includes(SIGNATURE) && identifier.signature) {
-    if (identifier.signature.paramsText.length > 0) content.appendCodeblock(`params: ${identifier.signature.paramsText}`, identifier.language);
-    if (identifier.signature.returnsText.length > 0) content.appendCodeblock(`returns: ${identifier.signature.returnsText}`, identifier.language);
-  }
-}
-
-function appendCodeBlock(identifier, displayItems, content) {
-  if (displayItems.includes(CODEBLOCK) && identifier.block) {
-    content.appendCodeblock(identifier.block, identifier.language);
-  }
-}
-
-function appendBody(text, content) {
-  if (!content.value.includes('---')) {
-    content.appendMarkdown('\n\n---');
-  }
-  content.appendMarkdown(`\n\n${text}`);
 }
 
 function getIdentifier(word, match, document, position) {

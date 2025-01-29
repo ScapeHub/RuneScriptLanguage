@@ -6,6 +6,7 @@ const referenceProvider = require('./provider/referenceProvider');
 const renameProvider = require('./provider/renameProvider');
 const cacheManager = require('./cache/cacheManager');
 const commands = require('./provider/vscodeCommands');
+const signatureHelp = require('./provider/signatureHelpProvider');
 
 const languages = ['runescript','locconfig','objconfig','npcconfig','dbtableconfig','dbrowconfig','paramconfig','structconfig','enumconfig','varpconfig','varnconfig','varsconfig','invconfig','seqconfig','spotanimconfig','mesanimconfig','idkconfig','huntconfig','constants','interface','pack'];
 
@@ -32,6 +33,8 @@ function activate(context) {
         context.subscriptions.push(vscode.languages.registerDefinitionProvider(language, definitionProvider));
         context.subscriptions.push(vscode.languages.registerReferenceProvider(language, referenceProvider));
     }
+
+    vscode.languages.registerSignatureHelpProvider('runescript', signatureHelp.provider(context), signatureHelp.metadata);
 }
 
 function deactivate() {
