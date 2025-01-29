@@ -49,10 +49,6 @@ function appendCodeBlock(identifier, displayItems, markdown) {
   }
 }
 
-function appendLocalVarText(text, markdown) {
-  markdown.appendCodeblock(text, 'runescript');
-}
-
 function appendBody(text, markdown) {
   if (!markdown.value.includes('---')) {
     markdown.appendMarkdown('\n\n---');
@@ -61,4 +57,4 @@ function appendBody(text, markdown) {
 }
 
 module.exports = { markdownBase, expectedIdentifierMessage, appendTitle, appendInfo, appendValue, 
-  appendSignature, appendCodeBlock, appendBody, appendLocalVarText };
+  appendSignature, appendCodeBlock, appendBody };

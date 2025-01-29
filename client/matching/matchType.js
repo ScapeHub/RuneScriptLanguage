@@ -156,6 +156,10 @@ const matchType = {
     id: 'STAT', types: ['stat'], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
   },
+  CATEGORY: { 
+    id: 'CATEGORY', types: ['category'], hoverOnly: true, cache: false, allowRename: false, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
+  },
   CATEGORY_TRIGGER: {
     id: 'CATEGORY_TRIGGER', types: [], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, VALUE]},

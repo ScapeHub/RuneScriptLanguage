@@ -8,9 +8,11 @@ const regex = {
   START_OF_LINE: /(?<=[\n])(?!.*[\n]).*/,
   END_OF_LINE: /\r\n|\r|\n/,
   WORD_PATTERN: /(\.\w+)|(\w+:\w+)|([^\`\~\!\@\#\%\^\&\*\(\)\-\$\=\+\[\{\]\}\\\|\;\:\'\\"\,\.\<\>\/\?\s]+)/g,
+  LOCAL_VAR_WORD_PATTERN: /(\$\w+)|(\.\w+)|(\w+:\w+)|([^\`\~\!\@\#\%\^\&\*\(\)\-\$\=\+\[\{\]\}\\\|\;\:\'\\"\,\.\<\>\/\?\s]+)/g,
   CONFIG_LINE: /^\w+=.+$/,
   CONFIG_DECLARATION: /\[\w+\]/,
   TRIGGER_LINE: /\[\w+,(\.)?\w+(:\w+)?\]/,
+  TRIGGER_DEFINITION: /\[.+,.+\](\([\w, :\.$]*\))?(\([\w, :\.$]*\))?/, 
   INFO_MATCHER: /\/\/[ ]{0,1}(desc|info):(.+)/,
   SWITCH_CASE: /\s*case.+/
 }

@@ -3,7 +3,7 @@ const { matchWordFromDocument } = require('../matching/matchWord');
 const identifierCache = require('../cache/identifierCache');
 const cacheUtils = require('../utils/cacheUtils');
 const matchType = require('../matching/matchType');
-const { parseScriptBlock } = require('../utils/localVarUtils');
+const activeFileCache = require('../cache/activeFileCache');
 
 const referenceProvider = {
   async provideReferences(document, position) {
@@ -13,10 +13,13 @@ const referenceProvider = {
       return null;
     }
 
-    // Local vars handled separately
+    // Use activeFileCache to get references of variables for active script block
     if (match.id === matchType.LOCAL_VAR.id) {
-      const { references } = parseScriptBlock(document, position, `$${word}`);
-      return references.map(range => new vscode.Location(document.uri, range));
+      const scriptData = activeFileCache.getScriptData(position.line);
+      if (scriptData) {
+        return (scriptData.variables[`$${word}`] || {references: []}).references;
+      }
+      return null;
     }
 
     // Get the identifier from the cache

@@ -2,8 +2,8 @@ const vscode = require('vscode');
 const identifierCache = require('../cache/identifierCache');
 const { matchWordFromDocument } = require('../matching/matchWord');
 const cacheUtils = require('../utils/cacheUtils');
-const { parseScriptBlock } = require('../utils/localVarUtils');
 const matchType = require('../matching/matchType');
+const activeFileCache = require('../cache/activeFileCache');
 
 const renameProvider = {
   prepareRename(document, position) {
@@ -32,11 +32,14 @@ const renameProvider = {
     // Provide rename edits
     const renameWorkspaceEdits = new vscode.WorkspaceEdit();
 
-    // Local vars handled separately
+    // Use activeFileCache to get references of variables for active script block
     if (match.id === matchType.LOCAL_VAR.id) {
-      const parsed = parseScriptBlock(document, position, `$${word}`);
-      if (parsed.declaration) renameWorkspaceEdits.replace(document.uri, parsed.declaration, `$${newName}`);
-      if (parsed.references) parsed.references.forEach(range => renameWorkspaceEdits.replace(document.uri, range, `$${newName}`));
+      const scriptData = activeFileCache.getScriptData(position.line);
+      if (scriptData) {
+        (scriptData.variables[`$${word}`] || {references: []}).references.forEach(location => {
+          renameWorkspaceEdits.replace(location.uri, location.range, `$${newName}`);
+        });
+      }
       return renameWorkspaceEdits;
     }
 

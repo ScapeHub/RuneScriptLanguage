@@ -1,7 +1,7 @@
 const { WORD_PATTERN } = require("../enum/regex");
 
-function getWords(lineText) {
-  return [ ...lineText.matchAll(WORD_PATTERN) ].map((wordMatch, index) => { 
+function getWords(lineText, wordPattern=WORD_PATTERN) {
+  return [ ...lineText.matchAll(wordPattern) ].map((wordMatch, index) => { 
     return { value: wordMatch[0], start: wordMatch.index, end: wordMatch.index + wordMatch[0].length - 1, index: index}
   });
 }

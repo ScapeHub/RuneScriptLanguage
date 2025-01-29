@@ -2,6 +2,7 @@ const fs = require('fs').promises;
 const vscode = require('vscode');
 const matchType = require("../matching/matchType");
 const identifierCache = require('./identifierCache');
+const activeFileCache = require('./activeFileCache');
 const stringUtils = require('../utils/stringUtils');
 const { matchWords } = require('../matching/matchWord');
 const identifierFactory = require('../resource/identifierFactory');
@@ -37,7 +38,18 @@ async function rebuildAll() {
   clearAll();
   const fileUris = await getFiles();
   await Promise.all(fileUris.map(uri => parseFileAndCacheIdentifiers(uri)));
-  return Promise.all(fileUris.map(uri => parseFileAndCacheIdentifiers(uri)));
+  await Promise.all(fileUris.map(uri => parseFileAndCacheIdentifiers(uri)));
+  return rebuildActiveFile(vscode.window.activeTextEditor.document.uri);
+}
+
+/**
+ * Rebuilds the activeFileCache, parses the active text editor file and stores relevant script data
+ * such as script variables, script return types, switch statement types, etc...
+ */
+function rebuildActiveFile(uri) {
+  if (uri.path.endsWith('.rs2')) {
+    activeFileCache.rebuild(uri);
+  }
 }
 
 /**
@@ -47,6 +59,7 @@ async function rebuildFile(uri) {
   if (isValidFile(uri)) {
     clearFile(uri);
     parseFileAndCacheIdentifiers(uri);
+    rebuildActiveFile(uri);
   }
 }
 
@@ -196,4 +209,4 @@ function clearFile(uri) {
   switchStmtLinesCache.clearFile(uri);
 }
 
-module.exports = { rebuildAll, rebuildFile, clearFiles, renameFiles, createFiles, clearAll }
+module.exports = { rebuildAll, rebuildFile, rebuildActiveFile, clearFiles, renameFiles, createFiles, clearAll }

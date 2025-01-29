@@ -1,8 +1,7 @@
 const vscode = require('vscode');
-const stringUtils = require('../utils/stringUtils');
-const localVarUtils = require('../utils/localVarUtils');
 const matchType = require('../matching/matchType');
 const identifierCache = require('../cache/identifierCache');
+const activeFileCache = require('../cache/activeFileCache');
 const identifierFactory = require('../resource/identifierFactory');
 const { matchWordFromDocument } = require('../matching/matchWord');
 const { resolve } = require('../resource/hoverConfigResolver');
@@ -24,7 +23,7 @@ const hoverProvider = function(context) {
 
       // Local vars are handled differently than the rest
       if (match.id === matchType.LOCAL_VAR.id) {
-        appendLocalVarHoverText(document, position, word, match, markdown);
+        appendLocalVarHoverText(position, word, match, markdown);
         return new vscode.Hover(markdown);
       }
 
@@ -59,20 +58,15 @@ const hoverProvider = function(context) {
   };
 }
 
-function appendLocalVarHoverText(document, position, word, match, markdown) {
-  const fileText = document.getText(new vscode.Range(new vscode.Position(0, 0), position.translate(1, 0)));
-  const foundLocalVar = localVarUtils.findLocalVar(fileText, word);
-  if (!foundLocalVar) {
-    expectedIdentifierMessage(word, match, markdown);
-  } else {
-    appendTitle(word, 'rs2', match.id, markdown);
-    const isDef = fileText.substring(Math.max(foundLocalVar.index - 4, 0), foundLocalVar.index) === "def_";
-    if (isDef) {
-      const line = stringUtils.getLineText(fileText.substring(foundLocalVar.index - 4));
-      appendLocalVarText(line.substring(line.indexOf('def_') + 4, line.indexOf(word) + word.length), markdown);
+function appendLocalVarHoverText(position, word, match, markdown) {
+  const scriptData = activeFileCache.getScriptData(position.line);
+  if (scriptData) {
+    const variable = scriptData.variables[`$${word}`];
+    if (variable) {
+      appendTitle(word, 'rs2', match.id, markdown);
+      markdown.appendCodeblock(variable.parameter ? `${variable.type} $${word} (script parameter)` : `${variable.type} $${word}`, 'runescript');
     } else {
-      const lineText = stringUtils.getLineText(fileText.substring(foundLocalVar.index));
-      appendLocalVarText(`${lineText.substring(0, lineText.indexOf(word) + word.length)} (script parameter)`, markdown);
+      expectedIdentifierMessage(word, match, markdown);
     }
   }
 }
