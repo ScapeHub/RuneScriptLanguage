@@ -173,13 +173,9 @@ const matchType = {
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
   },
   CATEGORY: { 
-    id: 'CATEGORY', types: ['category'], hoverOnly: true, cache: false, allowRename: false, 
-    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
-  },
-  CATEGORY_TRIGGER: {
-    id: 'CATEGORY_TRIGGER', types: [], hoverOnly: true, cache: false, allowRename: false, 
-    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, VALUE]},
-    postProcessor: postProcessors.categoryTriggerPostProcessor
+    id: 'CATEGORY', types: ['category'], hoverOnly: true, cache: true, allowRename: true, referenceOnly: true, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, VALUE]},
+    postProcessor: postProcessors.categoryPostProcessor
   },
   // NOOP Match types that might get detected, but nothing is done with them (no hover display, no finding references/declarations)
   // Useful for terminating word searching early when detected, and possibly doing something with them at a later date

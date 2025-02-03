@@ -4,6 +4,7 @@ const matchType = require("../matching/matchType");
 const configKeys = {
   table: { match: matchType.DBTABLE },
   huntmode: { match: matchType.HUNT },
+  category: { match: matchType.CATEGORY },
 }
 
 // === REGEX CONFIG KEY MATCHES ===

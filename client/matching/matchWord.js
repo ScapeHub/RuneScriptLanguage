@@ -95,7 +95,13 @@ function response(match, context) {
   if (match.id === matchType.OBJ.id && context.word.value.startsWith('cert_')) {
     context.word.value = context.word.value.substring(5);
     context.word.start = context.word.start + 5;
+    context.originalPrefix = 'cert_';
     context.cert = true;
+  }
+  if (match.id === matchType.CATEGORY.id && context.word.value.startsWith('_')) {
+    context.word.value = context.word.value.substring(1);
+    context.word.start = context.word.start + 1;
+    context.originalPrefix = '_';
   }
   return { match: match, word: context.word.value, context: context };
 }

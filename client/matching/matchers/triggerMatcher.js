@@ -17,7 +17,7 @@ function triggerMatcher(context) {
         return reference(matchType.TRIGGER, {triggerName: context.words[1].value});
       }
       if (context.word.value.charAt(0) === '_') {
-        return declaration(matchType.CATEGORY_TRIGGER, {matchId: trigger.match.id, categoryName: context.word.value.substring(1)});
+        return reference(matchType.CATEGORY, {matchId: trigger.match.id, categoryName: context.word.value.substring(1)});
       }
       return trigger.declaration ? declaration(trigger.match) : reference(trigger.match);
     }

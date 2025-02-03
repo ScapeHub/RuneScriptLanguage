@@ -26,7 +26,7 @@ const dataTypePostProcessor = function(identifier) {
 
 const configKeyPostProcessor = function(identifier) {
   const info = matchConfigKeyInfo(identifier.name, identifier.fileType);
-  info ? identifier.info = info : identifier.hideDisplay = true;
+  info ? identifier.info = info.replaceAll('$TYPE', identifier.fileType) : identifier.hideDisplay = true;
 }
 
 const triggerPostProcessor = function(identifier) {
@@ -34,7 +34,7 @@ const triggerPostProcessor = function(identifier) {
   if (info) identifier.info = info;
 }
 
-const categoryTriggerPostProcessor = function(identifier) {
+const categoryPostProcessor = function(identifier) {
   const extraData = identifier.extraData;
   if (extraData && extraData.matchId && extraData.categoryName) {
     identifier.value = `This script applies to all <b>${identifier.extraData.matchId}</b> with \`category=${identifier.extraData.categoryName}\``;
@@ -59,6 +59,6 @@ const fileNamePostProcessor = function(identifier) {
 
 module.exports = { 
   coordPostProcessor, enumPostProcessor, dataTypePostProcessor, configKeyPostProcessor, 
-  triggerPostProcessor, categoryTriggerPostProcessor, componentPostProcessor, columnPostProcessor,
+  triggerPostProcessor, categoryPostProcessor, componentPostProcessor, columnPostProcessor,
   fileNamePostProcessor
 };

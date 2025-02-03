@@ -15,9 +15,6 @@ const renameProvider = {
     if (!match.allowRename || match.noop) {
       throw new Error(`${match.id} renaming not supported`);
     }
-    if (context.cert) {
-      throw new Error('Please rename the non-cert object instead');
-    }
     if (match.id !== matchType.LOCAL_VAR.id) {
       const identifier = identifierCache.get(word, match);
       if (!identifier) {
@@ -27,7 +24,7 @@ const renameProvider = {
 	},
 
 	provideRenameEdits(document, position, newName) {
-    const { word, match } = matchWordFromDocument(document, position);
+    const { word, match, context } = matchWordFromDocument(document, position);
 
     // Provide rename edits
     const renameWorkspaceEdits = new vscode.WorkspaceEdit();
@@ -46,6 +43,10 @@ const renameProvider = {
     // Decode all the references for the identifier into an array of vscode ranges,
     // then use that to rename all of the references to the newName
     const identifier = identifierCache.get(word, match);
+    // Strip the cert_ and the _ prefix on objs or categories
+    if (context.originalPrefix && newName.startsWith(context.originalPrefix)) {
+      newName = newName.substring(context.originalPrefix.length);
+    }
     if (identifier.references) {
       Object.keys(identifier.references).forEach(fileKey => {
         const uri = vscode.Uri.file(fileKey);

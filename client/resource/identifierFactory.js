@@ -41,7 +41,7 @@ function buildRef(name, match) {
     name: name,
     match: match,
     references: {},
-    fileType: match.fileTypes[0] || 'rs2',
+    fileType: (match.fileTypes || [])[0] || 'rs2',
     language: hoverConfigResolver.resolve(LANGUAGE, match),
   }
   if (match.referenceOnly) {
