@@ -3,6 +3,8 @@ const identifierCache = require('../cache/identifierCache');
 const returnBlockLinesCache = require('../cache/returnBlockLinesCache');
 const { getWordAtIndex, reference } = require('./matchUtils');
 
+// Checks if the index location of a line of code is within the parenthesis of an identifier
+// If it is, it returns which param index the cursor is at, the match type of that param, and the parent identifier itself
 function getParamsIdentifier(context) {
   const { identifierName, paramIndex } = parseForIdentifierNameAndParamIndex(context.line.text, context.lineIndex, context.words);
   if (!identifierName) {
@@ -52,18 +54,36 @@ function getParamsIdentifier(context) {
   } else {
     iden = identifierCache.get(name, matchType.COMMAND);
   }
-  if (iden && iden.signature && iden.signature.params.length > (paramIndex - indexOffset)) {
-    return {identifier: iden, index: paramIndex, match: reference(matchType[iden.signature.params[(paramIndex - indexOffset)].matchTypeId]), isReturns: false, dynamicCommand: dynamicCommand};
+  if (!iden) {
+    return null;
   }
-  return null;
+  const response = {identifier: iden, index: paramIndex, isReturns: false, dynamicCommand: dynamicCommand};
+   if (iden.signature && iden.signature.params.length > (paramIndex - indexOffset)) {
+    response.match = reference(matchType[iden.signature.params[(paramIndex - indexOffset)].matchTypeId]);
+  }
+  return response;
 }
 
+// Determines if we are inside of an identifiers parenthesis, and returns which param index it is if we are
+// Scans the characters from the cursor index to the begining of the code
 function parseForIdentifierNameAndParamIndex(lineText, index, words) {
-  let isInString = determineInString(lineText, index);
+  const init = initializeString(lineText, index);
+  lineText = init.interpolatedText || lineText;
+  let isInString = init.isInString;
+  let isInInterpolated = 0;
   let isInParams = 0;
   let paramIndex = 0;
   for (let i = index; i >= 0; i--) {
     const char = lineText.charAt(i);
+
+    // Handle interpolated code inside of strings, and nested interpolated code
+    if (char === '>') isInInterpolated++;
+    if (isInInterpolated > 0) {
+      if (char === '<') isInInterpolated--;
+      continue;
+    }
+
+    // Handle strings and escaped quotes within strings
     if (isInString) {
       if (char === '"' && i > 0 && lineText.charAt(i - 1) !== '\\') isInString = false;
       continue;
@@ -73,32 +93,51 @@ function parseForIdentifierNameAndParamIndex(lineText, index, words) {
       continue;
     }
 
-    if (char === ')') {
-      isInParams++;
-      continue;
-    }
+    // Handle nested parenthesis
+    if (char === ')') isInParams++;
     if (isInParams > 0) {
       if (char === '(') isInParams--;
       continue;
     }
 
+    // === Code below is only reached when not inside a string, interpolated code, or nested params ===
+    
+    // Increase param index when a comma is found
     if (char === ',') {
       paramIndex++;
-    } else if (char === '(') {
+    } 
+    // Reached the end of interpolated code without finding a match, exit early with null response
+    if (char === '<') { 
+      return {identifierName: null, paramIndex: null};
+    }
+    // Found an opening parenthesis which marks the end of our search, return the previous word (the identifier name)
+    if (char === '(') {
       return {identifierName: getWordAtIndex(words, i - 2), paramIndex: paramIndex};
     }
   }
   return {identifierName: null, paramIndex: null};
 }
 
-function determineInString(lineText, index) {
+// Determines if we are currently inside of a string, and if we are inside of interpolated code
+// Scans the characters from the cursor index to the end of the line of code
+function initializeString(lineText, index) {
   let quoteCount = 0;
+  let interpolatedCount = 0;
   for (let i = index; i < lineText.length; i++) {
     if (lineText.charAt(i) === '"' && i > 0 && lineText.charAt(i - 1) !== '\\') {
       quoteCount++;
     }
+    if (lineText.charAt(i) === '>') {
+      if (interpolatedCount === 0) {
+        return { interpolatedText: lineText.substring(0, i - 1), isInString: quoteCount % 2 === 1 };
+      }
+      interpolatedCount--;
+    }
+    if (lineText.charAt(i) === '<') {
+      interpolatedCount++;
+    }
   }
-  return quoteCount % 2 === 1;
+  return { isInString: quoteCount % 2 === 1 };
 }
 
 module.exports = { getParamsIdentifier };

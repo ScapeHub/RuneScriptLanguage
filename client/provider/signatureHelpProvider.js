@@ -9,40 +9,37 @@ const metadata = {
   retriggerCharacters: [',']
 }
 
-const provider = (extensionContext) => {
-  return {
-    provideSignatureHelp(document, position) {
-      // Get parameter identifier
-      let str = document.lineAt(position.line).text;
-      str = str.substring(0, position.character) + 'temp' + str.substring(position.character);
-      const matchContext = getBaseContext(str, position.line, document.uri);
-      matchContext.lineIndex = position.character + 1;
-      var paramIdentifier = getParamsIdentifier(matchContext);
-      if (!paramIdentifier) {
-        return null;
-      }
-
-      // For things like queues, manually handled - todo try to find better way
-      paramIdentifier = handleDynamicParams(paramIdentifier);
-
-      // Build the signature info
-      let label = `${paramIdentifier.identifier.name}(${paramIdentifier.identifier.signature.paramsText})`;
-      if (paramIdentifier.identifier.signature.returnsText.length > 0) {
-        label += `: ${paramIdentifier.identifier.signature.returnsText}`;
-      }
-      const signatureInfo = new vscode.SignatureInformation(label);
-      paramIdentifier.identifier.signature.paramsText.split(',').forEach(param => {
-        signatureInfo.parameters.push(new vscode.ParameterInformation(param.trim()));
-      })
-      signatureInfo.activeParameter = paramIdentifier.index;
-
-      // Build the signature help
-      const signatureHelp = new vscode.SignatureHelp();
-      signatureHelp.signatures.push(signatureInfo);
-      signatureHelp.activeSignature = 0;
-      signatureHelp.activeParameter = paramIdentifier.index;
-      return signatureHelp;
+const provider = {
+  provideSignatureHelp(document, position) {
+    // Get parameter identifier
+    let str = document.lineAt(position.line).text;
+    str = str.substring(0, position.character) + 'temp' + str.substring(position.character);
+    const matchContext = getBaseContext(str, position.line, document.uri);
+    matchContext.lineIndex = position.character + 1;
+    var paramIden = getParamsIdentifier(matchContext);
+    if (!paramIden) {
+      return null;
     }
+    if (!paramIden.isReturns && paramIden.identifier.signature.paramsText.length === 0) {
+      return displayMessage(`${paramIden.identifier.matchId} ${paramIden.identifier.name} has no parameters, remove the parenthesis`);
+    }
+
+    // For things like queues, manually handled - todo try to find better way
+    paramIden = handleDynamicParams(paramIden);
+
+    // Build the signature info
+    const signature = paramIden.identifier.signature;
+    const params = (paramIden.isReturns) ? signature.returnsText : signature.paramsText;
+    const label = (paramIden.isReturns) ? `return (${params})` : `${paramIden.identifier.name}(${params})${signature.returnsText.length > 0 ? `: ${signature.returnsText}` : ''}`;
+    const signatureInfo = new vscode.SignatureInformation(label);
+    params.split(',').forEach(param => signatureInfo.parameters.push(new vscode.ParameterInformation(param.trim())));
+    signatureInfo.activeParameter = paramIden.index;
+
+    // Build the signature help
+    const signatureHelp = new vscode.SignatureHelp();
+    signatureHelp.signatures.push(signatureInfo);
+    signatureHelp.activeSignature = 0;
+    return signatureHelp;
   }
 }
 
@@ -57,6 +54,14 @@ function handleDynamicParams(paramIdentifier) {
     }
   }
   return paramIdentifier;
+}
+
+function displayMessage(message) {
+  const signatureInfo = new vscode.SignatureInformation(message);
+  const signatureHelp = new vscode.SignatureHelp();
+  signatureHelp.signatures.push(signatureInfo);
+  signatureHelp.activeSignature = 0;
+  return signatureHelp;
 }
 
 module.exports = { provider, metadata };

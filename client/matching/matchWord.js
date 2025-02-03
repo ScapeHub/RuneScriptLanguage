@@ -100,4 +100,4 @@ function response(match, context) {
   return { match: match, word: context.word.value, context: context };
 }
 
-module.exports = { matchWords, matchWordFromDocument };
+module.exports = { matchWord, matchWords, matchWordFromDocument };

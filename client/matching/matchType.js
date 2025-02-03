@@ -156,6 +156,22 @@ const matchType = {
     id: 'STAT', types: ['stat'], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
   },
+  NPC_STAT: { 
+    id: 'NPC_STAT', types: ['npc_stat'], hoverOnly: true, cache: false, allowRename: false, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
+  },
+  NPC_MODE: { 
+    id: 'NPC_MODE', types: ['npc_mode'], hoverOnly: true, cache: false, allowRename: false, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
+  },
+  LOCSHAPE: { 
+    id: 'LOCSHAPE', types: ['locshape'], hoverOnly: true, cache: false, allowRename: false, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
+  },
+  FONTMETRICS: { 
+    id: 'FONTMETRICS', types: ['fontmetrics'], hoverOnly: true, cache: false, allowRename: false, 
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},
+  },
   CATEGORY: { 
     id: 'CATEGORY', types: ['category'], hoverOnly: true, cache: false, allowRename: false, 
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE]},

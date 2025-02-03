@@ -9,7 +9,7 @@ const matchType = require('../matching/matchType');
  * Builds an identifier object
  * identifier = {
  *  name: String,
- *  match: matchType,
+ *  matchId: matchTypeId,
  *  declaration: vscode.Location
  *  references: {filePath1: String[], filePath2: String[], ...} (String is encoded location value)
  *  fileType: String,

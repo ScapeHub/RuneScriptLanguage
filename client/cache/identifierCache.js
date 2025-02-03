@@ -1,5 +1,6 @@
 const { buildRef } = require('../resource/identifierFactory');
 const cacheUtils = require('../utils/cacheUtils');
+const completionCache = require('./completionCache');
 
 /**
  * The identifierCache stores all matched identifiers in the workspace
@@ -43,6 +44,7 @@ function put(name, match, identifier) {
   }
   addToFileMap(fileKey, key);
   identifierCache[key] = identifier;
+  completionCache.put(name, match.id, identifier);
 }
 
 function putReference(name, match, uri, lineNum, index, packId) {
@@ -64,6 +66,7 @@ function putReference(name, match, uri, lineNum, index, packId) {
 function clear() {
   identifierCache = {};
   fileToIdentifierMap = {};
+  completionCache.clear();
 }
 
 function clearFile(uri) {
@@ -77,6 +80,8 @@ function clearFile(uri) {
       }
       // Cleanup/Delete identifiers without a declaration who no longer have any references
       if (Object.keys(identifierCache[key].references).length === 0 && !identifierCache[key].declaration) {
+        const iden = identifierCache[key];
+        completionCache.remove(iden.name, iden.matchId);
         delete identifierCache[key];
       }
     }
@@ -85,6 +90,8 @@ function clearFile(uri) {
     if (identifierCache[key]) {
       // If the identifier has orphaned references, then we only delete the declaration and keep the identifier w/references
       // Otherwise, we delete the entire identifier (no declaration and no references => no longer exists in any capacity)
+      const iden = identifierCache[key];
+      completionCache.remove(iden.name, iden.matchId);
       const hasOrphanedRefs = Object.keys(identifierCache[key].references).length > 0;
       if (hasOrphanedRefs) {
         delete identifierCache[key].declaration;
