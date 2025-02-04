@@ -28,6 +28,27 @@ function getByKey(key) {
   return identifierCache[key];
 }
 
+/**
+ * Given a file URI, a line number, this will return the closest declaration identifier
+ * to the given line number which is above the line number provided.
+ */
+function getParentDeclaration(uri, lineNum) {
+  const fileIdentifiers = fileToIdentifierMap[cacheUtils.resolveFileKey(uri)];
+  if (!fileIdentifiers) {
+    return null;
+  }
+  let lineRef = -1;
+  let declaration;
+  fileIdentifiers.declarations.forEach(dec => {
+    const iden = identifierCache[dec];
+    if (iden.declaration && iden.declaration.range.start.line < lineNum && iden.declaration.range.start.line > lineRef) {
+      lineRef = iden.declaration.range.start.line;
+      declaration = iden;
+    }
+  });
+  return declaration;
+}
+
 function put(name, match, identifier) {
   const key = cacheUtils.resolveKey(name, match);
   const fileKey = cacheUtils.resolveFileKey(identifier.declaration.uri);
@@ -109,4 +130,4 @@ function addToFileMap(fileKey, identifierKey, declaration=true) {
   fileToIdentifierMap[fileKey] = identifiersInFile;
 }
 
-module.exports = { contains, get, getByKey, put, putReference, clear, clearFile };
+module.exports = { contains, get, getParentDeclaration, getByKey, put, putReference, clear, clearFile };

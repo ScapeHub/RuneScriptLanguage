@@ -3,9 +3,10 @@ const { configKeys, regexConfigKeys } = require("../../resource/configKeys");
 const dataTypeToMatchId = require("../../resource/dataTypeToMatchId");
 const matchType = require("../matchType");
 const identifierCache = require("../../cache/identifierCache");
-const { reference, declaration } = require("../../utils/matchUtils");
+const { reference, declaration, getWordAtIndex } = require("../../utils/matchUtils");
 
 const specialCaseCommandKeys = ['val', 'param'];
+const enumValMinimumIndex = 4; // val=
 
 /**
  * Looks for matches on config files, both config declarations and config line items
@@ -77,15 +78,19 @@ function paramSpecialCase(context) {
   if (context.word.index === 2) {
     const paramIdentifier = identifierCache.get(context.words[1].value, matchType.PARAM);
     if (paramIdentifier && paramIdentifier.extraData) {
-      return matchType[dataTypeToMatchId(paramIdentifier.extraData.dataType)];
+      return reference(matchType[dataTypeToMatchId(paramIdentifier.extraData.dataType)]);
     }
   }
   return matchType.UNKNOWN;
 }
 
 function valSpecialCase(context) {
-  // TODO enum input/output type matcher, have to get enum name somehow to get enum identifier
-  // data types IDs are defined on the identifier as: identifier.extraData.inputType, identifier.extraData.outputType
+  const enumIdentifier = identifierCache.getParentDeclaration(context.uri, context.line.number);
+  if (context.lineIndex >= enumValMinimumIndex) {
+    const commaIndex = context.line.text.indexOf(',');
+    if (context.lineIndex < commaIndex) return reference(matchType[dataTypeToMatchId(enumIdentifier.extraData.inputType)]);
+    if (context.lineIndex > commaIndex) return reference(matchType[dataTypeToMatchId(enumIdentifier.extraData.outputType)]);
+  }
   return matchType.UNKNOWN; 
 }
 
