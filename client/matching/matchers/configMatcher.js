@@ -5,7 +5,7 @@ const matchType = require("../matchType");
 const identifierCache = require("../../cache/identifierCache");
 const { reference, declaration, getWordAtIndex } = require("../../utils/matchUtils");
 
-const specialCaseCommandKeys = ['val', 'param'];
+const specialCaseCommandKeys = ['val', 'param', 'data'];
 const enumValMinimumIndex = 4; // val=
 
 /**
@@ -31,7 +31,10 @@ function configMatcher(context) {
     // Otherwise, if the second word is the selected word (word after '=') then handle remaining known keys/regex keys
     if (context.word.index >= 1) {
       const configMatch = configKeys[configKey];
-      return (configMatch) ? reference(configMatch.match) : checkRegexConfigKeys(configKey, context);
+      if (configMatch) {
+        return (configMatch.declaration) ? declaration(configMatch.match) : reference(configMatch.match);
+      }
+      return checkRegexConfigKeys(configKey, context);
     }
   }
 }
@@ -70,6 +73,7 @@ function handleSpecialCases(key, context) {
   switch (key) {
     case 'param': return paramSpecialCase(context);
     case 'val': return valSpecialCase(context);
+    case 'data': return dataSpecialCase(context);
   }
 }
 
@@ -92,6 +96,33 @@ function valSpecialCase(context) {
     if (context.lineIndex > commaIndex) return reference(matchType[dataTypeToMatchId(enumIdentifier.extraData.outputType)]);
   }
   return matchType.UNKNOWN; 
+}
+
+function dataSpecialCase(context) {
+  if (context.word.index === 1) return reference(matchType.DBCOLUMN);
+  if (context.word.index > 1) {
+    let colName = context.words[1].value;
+    if (context.words[1].value.indexOf(':') < 0) {
+      const row = identifierCache.getParentDeclaration(context.uri, context.line.number);
+      colName = `${row.extraData.table}:${context.words[1].value}`
+    }
+    const col = identifierCache.get(colName, matchType.DBCOLUMN);
+    if (col && col.extraData) {
+      let index = 0;
+      let i = 0
+      const split = context.line.text.split(',');
+      for (i = 0; i < split.length; i++) {
+        index += split[i].length;
+        if (context.lineIndex <= index) {
+          break;
+        }
+      }
+      if (split[i] === context.word.value) {
+        return reference(matchType[dataTypeToMatchId(col.extraData.dataTypes[i - 1])]);
+      }
+    }
+  }
+  return matchType.UNKNOWN;
 }
 
 module.exports = configMatcher;

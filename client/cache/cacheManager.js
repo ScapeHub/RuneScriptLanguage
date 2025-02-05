@@ -133,7 +133,11 @@ async function parseFileAndCacheIdentifiers(uri) {
           cacheReturnBlock(identifier, line, match);
         } else {
           const id = match.context.cert ? undefined : match.context.packId;
-          identifierCache.putReference(match.word, match.match, uri, line, match.context.word.start, id);
+          let index = match.context.word.start;
+          if (!match.context.modifiedWord && match.word.indexOf(':') > 0) {
+            index += match.word.indexOf(':') + 1;
+          }
+          identifierCache.putReference(match.word, match.match, uri, line, index, id);
         }
       });
     }

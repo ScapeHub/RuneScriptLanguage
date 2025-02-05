@@ -5,6 +5,7 @@ const configKeys = {
   table: { match: matchType.DBTABLE },
   huntmode: { match: matchType.HUNT },
   category: { match: matchType.CATEGORY },
+  column: { match: matchType.DBCOLUMN, declaration: true },
 }
 
 // === REGEX CONFIG KEY MATCHES ===

@@ -12,6 +12,8 @@ all the necessary data it needs for finding declarations, building hover texts, 
   cache: boolean - whether or not identifiers with this matchType should be cached
   hoverConfig: Object - Config options to modify the hover display for this matchType, options in hoverConfig.js
   postProcessor: Function(identifier) - An optional post processing function to apply for this matchType, see postProcessors.js
+  allowRename: Whether or not to allow rename symbol (F2) on this type
+  referenceOnly: If true, then declaration is not saved/doesn't exist and only references exist. Default ctrl+click will be goto references rather than goto definition.
   hoverOnly: boolean - if true, this match type is only used for hover displays
   noop: boolean - if true, nothing is done with this match type (but still useful for terminating word searching early)
 }
@@ -83,12 +85,14 @@ const matchType = {
     postProcessor: postProcessors.enumPostProcessor
   },
   DBCOLUMN: {
-    id: 'DBCOLUMN', types: ['dbcolumn'], fileTypes: ['dbrow'], cache: true, allowRename: true, 
-    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [], [REFERENCE_HOVER_ITEMS]: [], [LANGUAGE]: 'dbrowconfig'},
+    id: 'DBCOLUMN', types: ['dbcolumn'], fileTypes: ['dbtable'], cache: true, allowRename: true, 
+    hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'runescript', [BLOCK_SKIP_LINES]: 0},
+    postProcessor: postProcessors.columnPostProcessor
   },
   DBROW: {
     id: 'DBROW', types: ['dbrow'], fileTypes: ['dbrow'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbrowconfig', [CONFIG_INCLUSIONS]: ['table']},
+    postProcessor: postProcessors.rowPostProcessor
   },
   DBTABLE: {
     id: 'DBTABLE', types: ['dbtable'], fileTypes: ['dbtable'], cache: true, allowRename: true, 
@@ -100,7 +104,7 @@ const matchType = {
     postProcessor: postProcessors.fileNamePostProcessor
   },
   COMPONENT: {
-    id: 'COMPONENT', types: ['component'], fileTypes: ['if'], cache: true, allowRename: false, 
+    id: 'COMPONENT', types: ['component'], fileTypes: ['if'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'interface'},
     postProcessor: postProcessors.componentPostProcessor
   },

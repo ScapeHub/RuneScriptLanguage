@@ -35,6 +35,10 @@ const referenceProvider = {
       identifier.references[fileKey].forEach(encodedReference => 
         referenceLocations.push(cacheUtils.decodeReferenceToLocation(uri, encodedReference)));
     });
+    // If there is only one reference and its the declaration, return null as theres no other references to show
+    if (match.declaration && referenceLocations.length === 1) {
+      return null;
+    }
     return referenceLocations;
   }
 }

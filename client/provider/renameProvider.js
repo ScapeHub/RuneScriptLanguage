@@ -47,11 +47,16 @@ const renameProvider = {
     if (context.originalPrefix && newName.startsWith(context.originalPrefix)) {
       newName = newName.substring(context.originalPrefix.length);
     }
+    // Strip the left side of identifier names with colons in them
+    if (newName.indexOf(':') > -1) {
+      newName = newName.substring(newName.indexOf(':') + 1);
+    }
     if (identifier.references) {
+      const wordLength = word.length - word.indexOf(':') - 1;
       Object.keys(identifier.references).forEach(fileKey => {
         const uri = vscode.Uri.file(fileKey);
         identifier.references[fileKey].forEach(encodedReference => {
-          const range = cacheUtils.decodeReferenceToRange(word.length, encodedReference);
+          const range = cacheUtils.decodeReferenceToRange(wordLength, encodedReference);
           renameWorkspaceEdits.replace(uri, range, newName);
         });
       });

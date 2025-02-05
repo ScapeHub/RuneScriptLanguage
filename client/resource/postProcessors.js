@@ -1,3 +1,4 @@
+const { END_OF_LINE } = require('../enum/regex');
 const matchConfigKeyInfo = require('../info/configKeyInfo');
 const matchTriggerInfo = require('../info/triggerInfo');
 const { getLineText } = require('../utils/stringUtils');
@@ -47,10 +48,25 @@ const componentPostProcessor = function(identifier) {
   identifier.name = split[1];
 }
 
+const rowPostProcessor = function(identifier) {
+  if (identifier.block) {
+    const tableName = (identifier.block.split('=') || ['', ''])[1];
+    identifier.info = `A row in the <b>${tableName}</b> table`;
+    delete identifier.block;
+    identifier.extraData = {table: tableName};
+  }
+}
+
 const columnPostProcessor = function(identifier) {
   const split = identifier.name.split(':');
   identifier.info = `A column of the <b>${split[0]}</b> table`;
   identifier.name = split[1];
+
+  const exec = END_OF_LINE.exec(identifier.block);
+  if (!exec) return;
+  const types = identifier.block.substring(8 + identifier.name.length, exec.index).split(',');
+  identifier.extraData = {dataTypes: types};
+  identifier.block = `Data types: ${types.join(', ')}`;
 }
 
 const fileNamePostProcessor = function(identifier) {
@@ -60,5 +76,5 @@ const fileNamePostProcessor = function(identifier) {
 module.exports = { 
   coordPostProcessor, enumPostProcessor, dataTypePostProcessor, configKeyPostProcessor, 
   triggerPostProcessor, categoryPostProcessor, componentPostProcessor, columnPostProcessor,
-  fileNamePostProcessor
+  fileNamePostProcessor, rowPostProcessor
 };

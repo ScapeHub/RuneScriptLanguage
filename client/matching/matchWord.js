@@ -1,5 +1,6 @@
 const matchType = require('./matchType');
 const { getWordAtIndex, getBaseContext } = require('../utils/matchUtils');
+const { getParentDeclaration } = require('../cache/identifierCache');
 
 // Do not reorder the matchers unless there is a reason to 
 // quicker potential matches are processed earlier in order to short circuit faster
@@ -91,17 +92,30 @@ function response(match, context) {
   }
   if (match.id === matchType.COMPONENT.id && !context.word.value.includes(':')) {
     context.word.value = `${context.file.name}:${context.word.value}`;
+    context.modifiedWord = true;
+  }
+  if (match.id === matchType.DBCOLUMN.id && !context.word.value.includes(':')) {
+    const requiredType = context.file.type === 'dbtable' ? matchType.DBTABLE.id : matchType.DBROW.id;
+    const iden = getParentDeclaration(context.uri, context.line.number, requiredType);
+    if (!iden) {
+      return undefined;
+    }
+    const tableName = (context.file.type === 'dbrow') ? iden.extraData.table : iden.name;
+    context.word.value = `${tableName}:${context.word.value}`;
+    context.modifiedWord = true;
   }
   if (match.id === matchType.OBJ.id && context.word.value.startsWith('cert_')) {
     context.word.value = context.word.value.substring(5);
     context.word.start = context.word.start + 5;
     context.originalPrefix = 'cert_';
     context.cert = true;
+    context.modifiedWord = true;
   }
   if (match.id === matchType.CATEGORY.id && context.word.value.startsWith('_')) {
     context.word.value = context.word.value.substring(1);
     context.word.start = context.word.start + 1;
     context.originalPrefix = '_';
+    context.modifiedWord = true;
   }
   return { match: match, word: context.word.value, context: context };
 }

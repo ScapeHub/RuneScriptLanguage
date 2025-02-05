@@ -32,7 +32,7 @@ function getByKey(key) {
  * Given a file URI, a line number, this will return the closest declaration identifier
  * to the given line number which is above the line number provided.
  */
-function getParentDeclaration(uri, lineNum) {
+function getParentDeclaration(uri, lineNum, requiredMatchTypeId=undefined) {
   const fileIdentifiers = fileToIdentifierMap[cacheUtils.resolveFileKey(uri)];
   if (!fileIdentifiers) {
     return null;
@@ -42,8 +42,10 @@ function getParentDeclaration(uri, lineNum) {
   fileIdentifiers.declarations.forEach(dec => {
     const iden = identifierCache[dec];
     if (iden.declaration && iden.declaration.range.start.line < lineNum && iden.declaration.range.start.line > lineRef) {
-      lineRef = iden.declaration.range.start.line;
-      declaration = iden;
+      if (!requiredMatchTypeId || requiredMatchTypeId === iden.matchId) {
+        lineRef = iden.declaration.range.start.line;
+        declaration = iden;
+      }
     }
   });
   return declaration;
