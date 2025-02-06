@@ -7,7 +7,7 @@ const { matchWordFromDocument } = require('../matching/matchWord');
 const { resolve } = require('../resource/hoverConfigResolver');
 const { DECLARATION_HOVER_ITEMS, REFERENCE_HOVER_ITEMS } = require('../enum/hoverConfigOptions');
 const { markdownBase, appendTitle, appendInfo, appendValue, appendSignature, 
-  appendCodeBlock, expectedIdentifierMessage, appendLocalVarText } = require('../utils/markdownUtils');
+  appendCodeBlock, expectedIdentifierMessage } = require('../utils/markdownUtils');
 
 const hoverProvider = function(context) {
   return {

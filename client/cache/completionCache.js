@@ -21,6 +21,14 @@ function getAllWithPrefix(prefix, matchTypeId) {
   return null;
 }
 
+function contains(name, matchTypeId) {
+  const matchTrie = completionCache[matchTypeId];
+  if (matchTrie) {
+    return matchTrie.hasWord(name);
+  }
+  return false;
+}
+
 function remove(name, matchTypeId) {
   const matchTrie = completionCache[matchTypeId];
   if (matchTrie) {
@@ -40,4 +48,4 @@ function getTypes() {
   return Object.keys(completionCache);
 }
 
-module.exports = { put, getAllWithPrefix, getTypes, remove, clear };
+module.exports = { put, getAllWithPrefix, getTypes, contains, remove, clear };

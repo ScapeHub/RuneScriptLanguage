@@ -3,7 +3,7 @@ const { configKeys, regexConfigKeys } = require("../../resource/configKeys");
 const dataTypeToMatchId = require("../../resource/dataTypeToMatchId");
 const matchType = require("../matchType");
 const identifierCache = require("../../cache/identifierCache");
-const { reference, declaration, getWordAtIndex } = require("../../utils/matchUtils");
+const { reference, declaration } = require("../../utils/matchUtils");
 
 const specialCaseCommandKeys = ['val', 'param', 'data'];
 const enumValMinimumIndex = 4; // val=

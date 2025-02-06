@@ -3,6 +3,8 @@ const activeFileCache = require('../cache/activeFileCache');
 const completionCache = require('../cache/completionCache');
 const matchType = require('../matching/matchType');
 const { matchWord } = require('../matching/matchWord');
+const activeCursorCache = require('../cache/activeCursorCache');
+const runescriptTrigger = require('../resource/triggers');
 
 const triggers = ['$', '^', '%', '~', '@', '`', '>'];
 const autoTriggeredTypeIds = [
@@ -18,7 +20,7 @@ const provider = {
     if (context.triggerKind === 1) {
       if (context.triggerCharacter === '`' && position.character > 1 && 
           document.lineAt(position.line).text.charAt(position.character - 2) === '`') {
-        return searchForMatchType(document, position);
+        return searchForMatchType(document, position, true);
       }
       return invoke(document, position, position.character - 1, '');
     }
@@ -38,7 +40,7 @@ function invoke(document, position, triggerIndex, word) {
     case '%': return completionByTrigger(word, matchType.GLOBAL_VAR.id);
     case '~': return completionByTrigger(word, matchType.PROC.id);
     case '@': return completionByTrigger(word, matchType.LABEL.id);
-    default: return null;
+    default: return searchForMatchType(document, position);
   }
 }
 
@@ -62,7 +64,12 @@ function completeLocalVar(position) {
 }
 
 function completionByTrigger(prefix, matchTypeId, additionalTextEdits) {
-  const identifierNames = completionCache.getAllWithPrefix(prefix, matchTypeId);
+  let identifierNames;
+  if (matchTypeId === matchType.TRIGGER.id) {
+    identifierNames = Object.keys(runescriptTrigger);
+  } else {
+    identifierNames = completionCache.getAllWithPrefix(prefix, matchTypeId);
+  }
   if (!identifierNames) {
     return null;
   }
@@ -97,12 +104,16 @@ function completionByType(document, position, triggerIndex, word) {
   return completionByTrigger(word, matchTypeId, additionalTextEdits);
 }
 
-function searchForMatchType(document, position) {
-  let str = document.lineAt(position.line).text;
-  str = str.substring(0, position.character - 2) + 'temp' + str.substring(position.character);
-  const match = matchWord(str, position.line, document.uri, position.character);
-  const matchTypeId = (match) ? match.match.id : matchType.COMMAND.id;
-  const additionalTextEdits = [vscode.TextEdit.delete(new vscode.Range(position.translate(0, -2), position))];
+function searchForMatchType(document, position, fromTrigger = false) {
+  const triggerOffset = fromTrigger ? 2 : 0;
+  let matchTypeId = fromTrigger ? false : activeCursorCache.get(document, position);
+  if (!matchTypeId) {
+    let str = document.lineAt(position.line).text;
+    str = str.substring(0, position.character - triggerOffset) + 'temp' + str.substring(position.character);
+    const match = matchWord(str, position.line, document.uri, position.character);
+    matchTypeId = (match) ? match.match.id : matchType.COMMAND.id;
+  }
+  const additionalTextEdits = [vscode.TextEdit.delete(new vscode.Range(position.translate(0, -triggerOffset), position))];
   return completionByTrigger('', matchTypeId, additionalTextEdits);
 }
 
