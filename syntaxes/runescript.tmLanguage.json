@@ -101,7 +101,7 @@
                 {
                     "comment": "Highlight the second half of [trigger,subject] yellow",
                     "name": "entity.name.function.runescript",
-                    "match": "(?<=,)(\\.)?\\w+\\]"
+                    "match": "(?<=,)(\\.)?\\w+(:\\w+)?\\]"
                 },
                 {
                     "comment": "Engine commands that are also function parameters",
