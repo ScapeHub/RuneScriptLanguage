@@ -186,9 +186,9 @@
             "// Default drop from config.",
             "obj_add(npc_coord, npc_param(death_drop), 1, ^lootdrop_duration);",
             "",
-            "def_int $$random = random(${2:roll});",
+            "def_int \\$random = random(${2:roll});",
             "",
-            "if ($$random < ${3:chance}) {",
+            "if (\\$random < ${3:chance}) {",
             "\tobj_add(npc_coord, ${4:drop}, 1, ^lootdrop_duration);",
             "}"
         ],

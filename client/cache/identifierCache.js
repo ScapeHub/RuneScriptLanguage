@@ -67,7 +67,7 @@ function put(name, match, identifier) {
   }
   addToFileMap(fileKey, key);
   identifierCache[key] = identifier;
-  completionCache.put(name, match.id, identifier);
+  completionCache.put(name, match.id);
 }
 
 function putReference(name, match, uri, lineNum, index, packId) {
@@ -84,6 +84,7 @@ function putReference(name, match, uri, lineNum, index, packId) {
   addToFileMap(fileKey, key, false);
   identifierCache[key].references[fileKey] = fileReferences;
   if (packId) identifierCache[key].id = packId;
+  if (match.referenceOnly) completionCache.put(name, match.id);
 }
 
 function clear() {

@@ -11,6 +11,10 @@ function put(name, matchTypeId) {
     completionCache[matchTypeId] = new Trie();
   }
   completionCache[matchTypeId].insert(name);
+  const colonIndex = name.indexOf(':');
+  if (colonIndex >= 0) {
+    completionCache[matchTypeId].insert(name.substring(colonIndex + 1));
+  }
 }
 
 function getAllWithPrefix(prefix, matchTypeId) {

@@ -11,9 +11,9 @@ const matchers = [
   require('./matchers/localVarMatcher'),
   require('./matchers/prevCharMatcher'),
   require('./matchers/triggerMatcher'),
-  require('./matchers/configMatcher'),
+  require('./matchers/configMatcher').configMatcher,
   require('./matchers/switchCaseMatcher'),
-  require('./matchers/parametersMatcher')
+  require('./matchers/parametersMatcher').parametersMatcher
 ];
 
 /**

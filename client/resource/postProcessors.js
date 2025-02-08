@@ -66,7 +66,7 @@ const columnPostProcessor = function(identifier) {
   if (!exec) return;
   const types = identifier.block.substring(8 + identifier.name.length, exec.index).split(',');
   identifier.extraData = {dataTypes: types};
-  identifier.block = `Data types: ${types.join(', ')}`;
+  identifier.block = `Field types: ${types.join(', ')}`;
 }
 
 const fileNamePostProcessor = function(identifier) {

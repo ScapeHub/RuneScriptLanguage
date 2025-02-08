@@ -1,12 +1,12 @@
 const vscode = require('vscode');
 const { getBaseContext } = require('../utils/matchUtils');
-const { getParamsIdentifier } = require('../utils/paramMatchingUtils');
 const matchType = require('../matching/matchType');
 const { get } = require('../cache/identifierCache');
 const activeCursorCache = require('../cache/activeCursorCache');
 const dataTypeToMatchId = require('../resource/dataTypeToMatchId');
 const runescriptTrigger = require('../resource/triggers');
 const { contains } = require('../cache/completionCache');
+const { getParamsMatch } = require('../matching/matchers/parametersMatcher');
 
 const metadata = {
   triggerCharacters: ['(', ',', '['], 
@@ -66,7 +66,7 @@ function getParametersHelp(document, position) {
   str = str.substring(0, position.character) + 'temp' + str.substring(position.character);
   const matchContext = getBaseContext(str, position.line, document.uri);
   matchContext.lineIndex = position.character + 1;
-  var paramIden = getParamsIdentifier(matchContext);
+  var paramIden = getParamsMatch(matchContext);
   if (!paramIden) {
     return null;
   }
