@@ -10,6 +10,7 @@ const configKeys = {
 // === REGEX CONFIG KEY MATCHES ===
 const regexConfigKeys = [
   { regex: /stock\d+/, params: [param('obj'), param('int'), param('int')], fileTypes: ["inv"] },
+  { regex: /count\d+/, params: [param('obj'), param('int')], fileTypes: ["obj"] },
   { regex: /\w*anim\w*/, params: [param('seq')], fileTypes: ["loc", "npc", "if", "spotanim"] },
 ]
 
