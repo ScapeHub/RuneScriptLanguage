@@ -5,7 +5,7 @@ function resolveKey(name, match) {
 }
 
 function resolveFileKey(uri) {
-  return (uri) ? uri.path : null;
+  return (uri) ? uri.fsPath : null;
 }
 
 function encodeReference(line, index) {

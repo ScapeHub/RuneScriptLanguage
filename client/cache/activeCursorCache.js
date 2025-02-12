@@ -4,14 +4,14 @@ let index;
 let path;
 
 function get(document, position) {
-  if (document.uri.path === path && position.line === line && getIndex(document, position) === index) {
+  if (document.uri.fsPath === path && position.line === line && getIndex(document, position) === index) {
     return activeCursorMatchTypeId;
   }
   return null;
 }
 
 function set(value, document, position) {
-  path = document.uri.path;
+  path = document.uri.fsPath;
   index = getIndex(document, position);
   line = position.line;
   activeCursorMatchTypeId = value;

@@ -34,7 +34,7 @@ function expandCsvKeyObject(obj) {
 function getBaseContext(lineText, lineNum, uri) {
   lineText = lineText.split('//')[0]; // Ignore anything after a comment
   const words = getWords(lineText);
-  const fileSplit = uri.path.split('\\').pop().split('/').pop().split('.');
+  const fileSplit = uri.fsPath.split('\\').pop().split('/').pop().split('.');
   return {
     words: words,
     uri: uri,

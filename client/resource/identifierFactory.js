@@ -25,7 +25,7 @@ function build(name, match, location, info = null, text = {lines: [], start: 0})
     match: match,
     declaration: location,
     references: {},
-    fileType: location ? location.uri.path.split(/[#?]/)[0].split('.').pop().trim() : 'rs2',
+    fileType: location ? location.uri.fsPath.split(/[#?]/)[0].split('.').pop().trim() : 'rs2',
     language: hoverConfigResolver.resolve(LANGUAGE, match),
     text: text
   }

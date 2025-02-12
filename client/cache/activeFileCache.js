@@ -34,7 +34,7 @@ function rebuild(uri) {
   scriptData = [];
   lineNumToScript = {};
   curData = null;
-  const fileText = fs.readFileSync(uri.path, "utf8");
+  const fileText = fs.readFileSync(uri.fsPath, "utf8");
   const lines = getLines(fileText);
   parseFile(lines, uri);
 }

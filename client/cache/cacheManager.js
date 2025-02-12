@@ -47,7 +47,7 @@ async function rebuildAll() {
  * such as script variables, script return types, switch statement types, etc...
  */
 function rebuildActiveFile(uri) {
-  if (uri.path.endsWith('.rs2')) {
+  if (uri.fsPath.endsWith('.rs2')) {
     activeFileCache.rebuild(uri);
   }
 }
@@ -111,8 +111,8 @@ async function getFiles() {
  * Parses the input file for identifiers, and caches them when found
  */
 async function parseFileAndCacheIdentifiers(uri) {
-  const isRs2 = uri.path.endsWith('.rs2');
-  const fileText = await fs.readFile(uri.path, "utf8");
+  const isRs2 = uri.fsPath.endsWith('.rs2');
+  const fileText = await fs.readFile(uri.fsPath, "utf8");
   const lines = stringUtils.getLines(fileText);
   for (let line = 0; line < lines.length; line++) {
     cacheSwitchStatementBlock(line, uri);
@@ -124,7 +124,7 @@ async function parseFileAndCacheIdentifiers(uri) {
           text.lines = (text.lines) ? text.lines : lines.slice(line);
           const location = new vscode.Location(uri, new vscode.Position(line, match.context.word.start));
           let info = (line > 0) ? getInfo(lines[line - 1]) : null;
-          if (!info && uri.path.endsWith('engine.rs2')) {
+          if (!info && uri.fsPath.endsWith('engine.rs2')) {
             info = engineSpecificInfo(lines[line - 1], match.word)
           } 
           const identifier = identifierFactory.build(match.word, match.match, location, info, text);
@@ -192,7 +192,7 @@ function engineSpecificInfo(infoLine, commandName) {
  * Checks if the file extension of the uri is in the list of monitored file types
  */
 function isValidFile(uri) {
-  return monitoredFileTypes.has(uri.path.split(/[#?]/)[0].split('.').pop().trim());
+  return monitoredFileTypes.has(uri.fsPath.split(/[#?]/)[0].split('.').pop().trim());
 }
 
 /**
