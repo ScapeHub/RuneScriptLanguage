@@ -49,7 +49,7 @@ configDuplicates.forEach(dupeDef => {
   for (let i = 1; i <= dupeDef.upToNum; i++) {
     runescriptTrigger[`${dupeDef.startsWith}${i}`] = build(dupeDef.defaultMatch, false);
   }
-  if (dupeDef.includeU) runescriptTrigger[`${dupeDef.startsWith}u`] = build(matchType.OBJ, false);
+  if (dupeDef.includeU) runescriptTrigger[`${dupeDef.startsWith}u`] = build(dupeDef.defaultMatch, false);
   if (dupeDef.includeT) runescriptTrigger[`${dupeDef.startsWith}t`] = build(matchType.COMPONENT, false);
   if (dupeDef.includeD) runescriptTrigger[`${dupeDef.startsWith}d`] = build(dupeDef.defaultMatch, false);
 });
