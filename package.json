@@ -1,10 +1,10 @@
 {
     "name": "runescriptlanguage",
     "displayName": "RuneScript Language Support",
-    "publisher": "2004scape",
-    "repository": "https://github.com/LostCityRS/RuneScriptLanguage",
+    "publisher": "ScapeHub",
+    "repository": "https://github.com/ScapeHub/RuneScriptLanguage",
     "description": "Syntax highlighting for RuneScript.",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "engines": {
         "vscode": "^1.75.0"
     },
@@ -176,6 +176,20 @@
                 }
             },
             {
+                "id": "varbitconfig",
+                "aliases": [
+                    "Varbit Player Config"
+                ],
+                "extensions": [
+                    ".varbit"
+                ],
+                "configuration": "./language-configuration/confscript.language-configuration.json",
+                "icon": {
+                    "dark": "./icons/varbit.png",
+                    "light": "./icons/varbit.png"
+                }
+            },
+            {
                 "id": "varnconfig",
                 "aliases": [
                     "Var NPC Config"
@@ -187,6 +201,20 @@
                 "icon": {
                     "dark": "./icons/varn.png",
                     "light": "./icons/varn.png"
+                }
+            },
+            {
+                "id": "varnbitconfig",
+                "aliases": [
+                    "Varbit NPC Config"
+                ],
+                "extensions": [
+                    ".varnbit"
+                ],
+                "configuration": "./language-configuration/confscript.language-configuration.json",
+                "icon": {
+                    "dark": "./icons/varnbit.png",
+                    "light": "./icons/varnbit.png"
                 }
             },
             {
@@ -330,6 +358,20 @@
                 }
             },
             {
+                "id": "fluconfig",
+                "aliases": [
+                    "Floor underlay Config"
+                ],
+                "extensions": [
+                    ".flu"
+                ],
+                "configuration": "./language-configuration/confscript.language-configuration.json",
+                "icon": {
+                    "dark": "./icons/flu.png",
+                    "light": "./icons/flu.png"
+                }
+            },
+            {
                 "id": "pack",
                 "aliases": [
                     "Pack File"
@@ -438,9 +480,19 @@
                 "path": "./syntaxes/varpconfig.tmLanguage.json"
             },
             {
+                "language": "varbitconfig",
+                "scopeName": "source.varbitconfig",
+                "path": "./syntaxes/varbitconfig.tmLanguage.json"
+            },
+            {
                 "language": "varnconfig",
                 "scopeName": "source.varnconfig",
                 "path": "./syntaxes/varnconfig.tmLanguage.json"
+            },
+            {
+                "language": "varnbitconfig",
+                "scopeName": "source.varnbitconfig",
+                "path": "./syntaxes/varnbitconfig.tmLanguage.json"
             },
             {
                 "language": "varsconfig",
@@ -491,6 +543,11 @@
                 "language": "floconfig",
                 "scopeName": "source.floconfig",
                 "path": "./syntaxes/floconfig.tmLanguage.json"
+            },
+            {
+                "language": "fluconfig",
+                "scopeName": "source.fluconfig",
+                "path": "./syntaxes/fluconfig.tmLanguage.json"
             },
             {
                 "language": "pack",

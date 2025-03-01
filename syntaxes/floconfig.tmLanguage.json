@@ -68,7 +68,7 @@
                     }
                 },
                 {
-                    "comment": "Flo rgb values",
+                    "comment": "Flo rgb values hex",
                     "match": "^(rgb)=(0[xX][0-9a-fA-F]+)?",
                     "captures": {
                         "1": {
@@ -76,6 +76,30 @@
                         },
                         "2": {
                             "name": "constant.numeric.interface"
+                        }
+                    }
+                },
+                {
+                    "comment": "Flo rgb values dec",
+                    "match": "^(rgb)=(\\d+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.interface.key"
+                        },
+                        "2": {
+                            "name": "constant.numeric.floconfig"
+                        }
+                    }
+                },
+                {
+                    "comment": "Flo maprgb values dec",
+                    "match": "^(maprgb)=(\\d+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.interface.key"
+                        },
+                        "2": {
+                            "name": "constant.numeric.floconfig"
                         }
                     }
                 }

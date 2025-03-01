@@ -1,0 +1,78 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "varnbitconfig",
+    "patterns": [
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#config"
+        }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line",
+                    "match": "(//).*\\n?"
+                },
+                {
+                    "name": "comment.block",
+                    "begin": "/\\*",
+                    "end": "\\*/"
+                }
+            ]
+        },
+        "config": {
+            "patterns": [
+                {
+                    "comment": "[name]",
+                    "name": "entity.name.function.varnbitconfig",
+                    "match": "\\[\\w+\\]"
+                },
+                {
+                    "comment": "Numeric values",
+                    "name": "constant.numeric.varnbitconfig",
+                    "match": "\\b\\d+\\b"
+                },
+                {
+                    "comment": "Base varp values",
+                    "match": "^(basevar)=(.+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.varnbitconfig.key"
+                        },
+                        "2": {
+                            "name": "variable.name.varnbitconfig.value"
+                        }
+                    }
+                },
+                {
+                    "comment": "Starting bit values",
+                    "match": "^(startbit)=(\\d+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.varnbitconfig.key"
+                        },
+                        "2": {
+                            "name": "constant.numeric.varnbitconfig"
+                        }
+                    }
+                },
+                {
+                    "comment": "Ending bit values",
+                    "match": "^(endbit)=(\\d+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.varnbitconfig.key"
+                        },
+                        "2": {
+                            "name": "constant.numeric.varnbitconfig"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "scopeName": "source.varnbitconfig"
+}
