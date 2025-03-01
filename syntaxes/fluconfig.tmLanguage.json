@@ -1,0 +1,66 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "fluconfig",
+    "patterns": [
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#config"
+        }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line",
+                    "match": "(//).*\\n?"
+                },
+                {
+                    "name": "comment.block",
+                    "begin": "/\\*",
+                    "end": "\\*/"
+                }
+            ]
+        },
+        "config": {
+            "patterns": [
+                {
+                    "comment": "[name]",
+                    "name": "entity.name.function.fluconfig",
+                    "match": "\\[\\w+\\]"
+                },
+                {
+                    "comment": "Numeric values",
+                    "name": "constant.numeric.fluconfig",
+                    "match": "\\b\\d+\\b"
+                },
+                {
+                    "comment": "Flo rgb values hex",
+                    "match": "^(rgb)=(0[xX][0-9a-fA-F]+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.interface.key"
+                        },
+                        "2": {
+                            "name": "constant.numeric.interface"
+                        }
+                    }
+                },
+                {
+                    "comment": "Flo rgb values dec",
+                    "match": "^(rgb)=(\\d+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.interface.key"
+                        },
+                        "2": {
+                            "name": "constant.numeric.fluconfig"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "scopeName": "source.fluconfig"
+}

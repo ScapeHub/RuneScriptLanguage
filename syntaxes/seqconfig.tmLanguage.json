@@ -45,7 +45,7 @@
                 {
                     "comment": "Config properties",
                     "name": "entity.name.type.seqconfig",
-                    "match": "^(delay\\d+|replayoff|priority|replaycount|stretches)(?==)"
+                    "match": "^(delay\\d+|replayoff|loop_behaviour|priority|replaycount|stretches)(?==)"
                 },
                 {
                     "comment": "Numeric values",
@@ -100,6 +100,30 @@
                         },
                         "2": {
                             "name": "constant.numeric.seqconfig.value"
+                        }
+                    }
+                },
+                {
+                    "comment": "Sequence preanim move value",
+                    "match": "^(preanim_move)=(delaymove|delayanim|merge)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.seqconfig.key"
+                        },
+                        "2": {
+                            "name": "variable.language.seqconfig"
+                        }
+                    }
+                },
+                {
+                    "comment": "Sequence postanim move value",
+                    "match": "^(postanim_move)=(delaymove|abortanim|merge)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.seqconfig.key"
+                        },
+                        "2": {
+                            "name": "variable.language.seqconfig"
                         }
                     }
                 }

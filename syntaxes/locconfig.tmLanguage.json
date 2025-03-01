@@ -45,7 +45,7 @@
                 {
                     "comment": "Config properties",
                     "name": "entity.name.type.locconfig",
-                    "match": "^(width|length|recol[1-6][sd]|wallwidth|ambient|contrast|mapfunction|resizex|resizey|resizez|mapscene|offsetx|offsety|offsetz|blockwalk|blockrange|active|hillskew|sharelight|occlude|hasalpha|mirror|shadow|forcedecor)(?==)"
+                    "match": "^(width|length|recol[1-6][sd]|wallwidth|raiseobject|ambient|contrast|mapfunction|resizex|resizey|resizez|mapscene|offsetx|offsety|offsetz|blockwalk|blockrange|active|hillskew|sharelight|occlude|hasalpha|mirror|shadow|forcedecor)(?==)"
                 },
                 {
                     "comment": "Numeric values",
@@ -69,7 +69,34 @@
                 },
                 {
                     "comment": "Reference values",
-                    "match": "^(model|category|anim|retex[1-6][sd])=(.+)",
+                    "match": "^(category|anim|retex[1-6][sd])=(.+)",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.locconfig.key"
+                        },
+                        "2": {
+                            "name": "variable.name.locconfig.value"
+                        }
+                    }
+                },
+                {
+                    "comment": "Model shape Reference values",
+                    "match": "^(model\\d*)=(.+),(wall_straight|wall_diagonalcorner|wall_l|wall_squarecorner|walldecor_straight_nooffset|walldecor_straight_offset|walldecor_diagonal_nooffset|walldecor_diagonal_offset|walldecor_diagonal_both|wall_diagonal|centrepiece_straight|centrepiece_diagonal|roof_straight|roof_diagonal_with_roofedge|roof_diagonal|roof_l_concave|roof_l_convex|roof_flat|roofedge_straight|roofedge_diagonalcorner|roofedge_l|roofedge_squarecorner|grounddecor)",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.locconfig.key"
+                        },
+                        "2": {
+                            "name": "variable.name.locconfig.value"
+                        },
+                        "3": {
+                            "name": "variable.language.locconfig"
+                        }
+                    }
+                },
+                {
+                    "comment": "Model Reference values",
+                    "match": "^(model\\d*)=(.+)",
                     "captures": {
                         "1": {
                             "name": "entity.name.type.locconfig.key"
@@ -102,6 +129,33 @@
                             "name": "entity.name.type.locconfig.key"
                         },
                         "2": {
+                            "name": "variable.language.locconfig"
+                        }
+                    }
+                },
+                {
+                    "comment": "Location multiloc varp/varbit values",
+                    "match": "^(multivarbit|multivarp)=(.+)?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.locconfig.key"
+                        },
+                        "2": {
+                            "name": "variable.name.locconfig.value"
+                        }
+                    }
+                },
+                {
+                    "comment": "Location multiloc values",
+                    "match": "^(multiloc\\d*)=((none)|(.+))?",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.type.locconfig.key"
+                        },
+                        "2": {
+                            "name": "variable.name.locconfig.value"
+                        },
+                        "3": {
                             "name": "variable.language.locconfig"
                         }
                     }
