@@ -1,7 +1,7 @@
 {
     "name": "runescriptlanguage",
     "displayName": "RuneScript Language Support",
-    "publisher": "ScapeHub",
+    "publisher": "scaperune",
     "repository": "https://github.com/ScapeHub/RuneScriptLanguage",
     "description": "Syntax highlighting for RuneScript.",
     "version": "0.3.0",
