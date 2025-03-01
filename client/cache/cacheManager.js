@@ -46,10 +46,12 @@ async function rebuildAll() {
  * Rebuilds the activeFileCache, parses the active text editor file and stores relevant script data
  * such as script variables, script return types, switch statement types, etc...
  */
-function rebuildActiveFile(uri) {
-  if (uri.fsPath.endsWith('.rs2')) {
-    activeFileCache.rebuild(uri);
-  }
+var debounceTimer;
+function rebuildActiveFile() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    activeFileCache.rebuild();
+  }, 400);
 }
 
 /**
@@ -59,7 +61,7 @@ async function rebuildFile(uri) {
   if (isValidFile(uri)) {
     clearFile(uri);
     parseFileAndCacheIdentifiers(uri);
-    rebuildActiveFile(uri);
+    rebuildActiveFile();
   }
 }
 
