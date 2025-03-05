@@ -1,8 +1,11 @@
 <div align="center">
 
-<h1>ScapeHub - RuneScript Language Extension</h1>
+# ScapeHub - RuneScript Language Extension
 
 </div>
+
+A fork of the LostCity extension which includes updates to support
+400+ RuneScape revisions.
 
 ## Features
 
