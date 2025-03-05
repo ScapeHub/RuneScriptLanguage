@@ -2,8 +2,9 @@ const { CONFIG_DECLARATION, CONFIG_LINE } = require("../../enum/regex");
 const matchType = require("../matchType");
 const { declaration, reference } = require("../../utils/matchUtils");
 const dataTypeToMatchId = require("../../resource/dataTypeToMatchId");
-const { regexConfigKeys, configKeys, specialCaseKeys } = require("../../resource/configKeys");
+const { regexConfigKeys, configKeys, specialCaseKeys, specialCaseKeysRegex} = require("../../resource/configKeys");
 const identifierCache = require('../../cache/identifierCache');
+const {cs1Commands, cs1VarCommands, cs1StatCommands, cs1InvCommands} = require("../../resource/cs1Commands");
 
 /**
  * Looks for matches on config files, both config declarations and config line items
@@ -49,7 +50,7 @@ function getConfigLineMatch(context) {
     return {...response, match: reference(matchType.CONFIG_KEY)};
   }
   // Check for special cases that need to be manually handled
-  if (specialCaseKeys.includes(configKey)) {
+  if (specialCaseKeys.includes(configKey) || isSpecialCaseRegexKey(configKey, context)) {
     return handleSpecialCases(response, configKey, context);
   }
   // Otherwise, if the second word is the selected word (word after '=') then handle remaining known keys/regex keys
@@ -76,6 +77,15 @@ function getRegexKey(configKey, context) {
   return null;
 }
 
+function isSpecialCaseRegexKey(configKey, context) {
+  for (let key of specialCaseKeysRegex) {
+    if (key.fileTypes.includes(context.file.type) && key.regex.test(configKey)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function getParamIndex(context) {
   let line = context.line.text;
   let index = 0;
@@ -89,12 +99,16 @@ function getParamIndex(context) {
   return undefined;
 }
 
+const cs1ScriptRegex = /script\d+op\d+/;
+
 function handleSpecialCases(response, key, context) {
   switch (key) {
     case 'param': return paramSpecialCase(response, context);
     case 'val': return valSpecialCase(response, context);
     case 'data': return dataSpecialCase(response, context);
   }
+
+  if (cs1ScriptRegex.test(key)) return cs1SpecialCase(response, context);
 }
 
 function paramSpecialCase(response, context) {
@@ -109,6 +123,37 @@ function paramSpecialCase(response, context) {
     }
   }
   return {...response, match: matchType.UNKNOWN};
+}
+
+
+function cs1SpecialCase(response, context) {
+  if (context.word.index === 1) return;
+
+  const command = cs1Commands.find(c => c === context.words[1].value);
+
+  if (context.word.index === 2) {
+    if (cs1VarCommands.includes(command)) {
+      const match = reference(matchType.GLOBAL_VAR);
+      return {...response, match: match};
+    }
+
+    if (cs1StatCommands.includes(command)) {
+      const match = reference(matchType.STAT);
+      return {...response, match: match};
+    }
+
+    if (cs1InvCommands.includes(command)) {
+      const match = reference(matchType.COMPONENT);
+      return {...response, match: match};
+    }
+  }
+
+  if (context.word.index === 3) {
+    if (cs1InvCommands.includes(command)) {
+      const match = reference(matchType.OBJ);
+      return {...response, match: match};
+    }
+  }
 }
 
 function valSpecialCase(response, context) {
