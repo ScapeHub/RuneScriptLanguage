@@ -100,7 +100,7 @@ const matchType = {
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbtableconfig'},
   },
   INTERFACE: {
-    id: 'INTERFACE', types: ['interface'], fileTypes: ['if'], cache: true, allowRename: false, referenceOnly: true, 
+    id: 'INTERFACE', types: ['interface'], fileTypes: ['if'], cache: true, allowRename: true, referenceOnly: true,
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'interface'},
     postProcessor: fileNamePostProcessor
   },
