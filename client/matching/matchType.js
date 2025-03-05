@@ -1,4 +1,4 @@
-const { dataTypePostProcessor, enumPostProcessor, columnPostProcessor, rowPostProcessor, componentPostProcessor, 
+const { dataTypePostProcessor, enumPostProcessor, columnPostProcessor, rowPostProcessor, componentPostProcessor,
   fileNamePostProcessor, coordPostProcessor, configKeyPostProcessor, triggerPostProcessor, categoryPostProcessor } = require('../resource/postProcessors');
 const { VALUE, SIGNATURE, CODEBLOCK, TITLE, INFO } = require("../enum/hoverDisplayItems");
 const { DECLARATION_HOVER_ITEMS, REFERENCE_HOVER_ITEMS, LANGUAGE, BLOCK_SKIP_LINES, CONFIG_INCLUSIONS } = require('../enum/hoverConfigOptions');
@@ -24,7 +24,7 @@ const matchType = {
     id: 'LOCAL_VAR', types: [], fileTypes: ['rs2'], cache: false, allowRename: true, 
   },
   GLOBAL_VAR: {
-    id: 'GLOBAL_VAR', types: [], fileTypes: ['varp', 'vars', 'varn', 'varbit', 'varnbit'], cache: true, allowRename: true,
+    id: 'GLOBAL_VAR', types: ['varp', 'vars', 'varn', 'varbit', 'varnbit'], fileTypes: ['varp', 'vars', 'varn', 'varbit', 'varnbit'], cache: true, allowRename: true,
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'varpconfig'},
     postProcessor: dataTypePostProcessor
   },
@@ -100,7 +100,7 @@ const matchType = {
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbtableconfig'},
   },
   INTERFACE: {
-    id: 'INTERFACE', types: ['interface'], fileTypes: ['if'], cache: true, allowRename: false, referenceOnly: true, 
+    id: 'INTERFACE', types: ['interface'], fileTypes: ['if'], cache: true, allowRename: true, referenceOnly: true,
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'interface'},
     postProcessor: fileNamePostProcessor
   },

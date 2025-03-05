@@ -45,7 +45,6 @@ const categoryPostProcessor = function(identifier) {
 const componentPostProcessor = function(identifier) {
   const split = identifier.name.split(':');
   identifier.info = `A component of the <b>${split[0]}</b> interface`;
-  identifier.name = split[1];
 }
 
 const rowPostProcessor = function(identifier) {

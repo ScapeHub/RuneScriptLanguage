@@ -1,6 +1,7 @@
 const { buildRef } = require('../resource/identifierFactory');
 const cacheUtils = require('../utils/cacheUtils');
 const completionCache = require('./completionCache');
+const matchType = require("../matching/matchType");
 
 /**
  * The identifierCache stores all matched identifiers in the workspace
@@ -22,6 +23,18 @@ function contains(name, match) {
 
 function get(name, match) {
   return identifierCache[cacheUtils.resolveKey(name, match)];
+}
+
+function getMatchingComponentKeys(name) {
+  const keys = [];
+  for (const key in identifierCache) {
+    if (!key.startsWith(`${name}:`) || !key.endsWith(matchType.COMPONENT.id)) {
+      continue;
+    }
+
+    keys.push(key);
+  }
+  return keys;
 }
 
 function getByKey(key) {
@@ -133,4 +146,4 @@ function addToFileMap(fileKey, identifierKey, declaration=true) {
   fileToIdentifierMap[fileKey] = identifiersInFile;
 }
 
-module.exports = { contains, get, getParentDeclaration, getByKey, put, putReference, clear, clearFile };
+module.exports = { contains, get, getParentDeclaration, getByKey, put, putReference, clear, clearFile, getMatchingComponentKeys };

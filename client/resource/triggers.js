@@ -8,7 +8,7 @@ const runescriptTrigger = {
   timer: build(matchType.TIMER, true),
   ai_timer: build(matchType.NPC, false),
   if_button: build(matchType.COMPONENT, false),
-  if_close: build(matchType.COMPONENT, false),
+  if_close: build(matchType.INTERFACE, false),
   walktrigger: build(matchType.WALKTRIGGER, true),
   ai_walktrigger: build(matchType.NPC, false),
   debugproc: build(matchType.UNKNOWN, true),
