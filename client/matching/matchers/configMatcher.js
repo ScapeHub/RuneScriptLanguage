@@ -127,11 +127,11 @@ function paramSpecialCase(response, context) {
 
 
 function cs1SpecialCase(response, context) {
-  if (context.word.index === 1) return;
-
-  const command = cs1Commands.find(c => c === context.words[1].value);
+  if (context.word.index === 1) return {...response, match: matchType.UNKNOWN};
 
   if (context.word.index === 2) {
+    const command = cs1Commands.find(c => c === context.words[1].value);
+
     if (cs1VarCommands.includes(command)) {
       const match = reference(matchType.GLOBAL_VAR);
       return {...response, match: match};
@@ -149,6 +149,8 @@ function cs1SpecialCase(response, context) {
   }
 
   if (context.word.index === 3) {
+    const command = cs1Commands.find(c => c === context.words[1].value);
+
     if (cs1InvCommands.includes(command)) {
       const match = reference(matchType.OBJ);
       return {...response, match: match};
