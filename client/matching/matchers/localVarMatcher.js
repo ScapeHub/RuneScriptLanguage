@@ -14,7 +14,7 @@ function matchLocalVar(context) {
     if (prevWord.startsWith("def_")) {
       prevWord = prevWord.substr(4);
     }
-    const defKeyword = "\\b(int|string|boolean|seq|locshape|component|idk|midi|npc_mode|namedobj|synth|stat|npc_stat|fontmetrics|enum|loc|model|npc|obj|player_uid|spotanim|npc_uid|inv|category|struct|dbrow|interface|dbtable|coord|mesanim|param|queue|weakqueue|timer|softtimer|char|dbcolumn|proc|label)\\b";
+    const defKeyword = "\\b(int|string|region_uid|boolean|seq|locshape|component|idk|midi|npc_mode|namedobj|synth|jingle|stat|npc_stat|fontmetrics|enum|loc|model|npc|obj|player_uid|spotanim|npc_uid|inv|category|struct|dbrow|interface|dbtable|coord|mesanim|param|queue|weakqueue|timer|softtimer|char|dbcolumn|proc|label)\\b";
     const match = prevWord.match(new RegExp(defKeyword));
     return !match ? reference(matchType.LOCAL_VAR) : declaration(matchType.LOCAL_VAR);
   }
