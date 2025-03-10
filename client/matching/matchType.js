@@ -123,6 +123,16 @@ const matchType = {
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
     postProcessor: fileNamePostProcessor
   },
+  JINGLE: {
+    id: 'JINGLE', types: ['jingle'], fileTypes: ['jingle'], cache: true, allowRename: false, referenceOnly: true,
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
+    postProcessor: fileNamePostProcessor
+  },
+  MIDI: {
+    id: 'MIDI', types: ['midi'], fileTypes: ['midi'], cache: true, allowRename: false, referenceOnly: true,
+    hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
+    postProcessor: fileNamePostProcessor
+  },
   WALKTRIGGER: {
     id: 'WALKTRIGGER', types: ['walktrigger'], fileTypes: ['rs2'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, SIGNATURE]},
