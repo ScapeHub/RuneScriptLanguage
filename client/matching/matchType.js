@@ -124,12 +124,12 @@ const matchType = {
     postProcessor: fileNamePostProcessor
   },
   JINGLE: {
-    id: 'JINGLE', types: ['jingle'], fileTypes: ['jingle'], cache: true, allowRename: false, referenceOnly: true,
+    id: 'JINGLE', types: ['jingle'], fileTypes: ['mid'], cache: true, allowRename: false, referenceOnly: true,
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
     postProcessor: fileNamePostProcessor
   },
   MIDI: {
-    id: 'MIDI', types: ['midi'], fileTypes: ['midi'], cache: true, allowRename: false, referenceOnly: true,
+    id: 'MIDI', types: ['midi'], fileTypes: ['mid'], cache: true, allowRename: false, referenceOnly: true,
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO]},
     postProcessor: fileNamePostProcessor
   },
