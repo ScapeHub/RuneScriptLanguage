@@ -15,20 +15,20 @@ const configKeys = {
 const regexConfigKeys = [
   { regex: /stock\d+/, params: [param('obj'), param('int'), param('int')], fileTypes: ["inv"] },
   { regex: /count\d+/, params: [param('obj'), param('int')], fileTypes: ["obj"] },
-  { regex: /\w*anim\w*/, params: [param('seq')], fileTypes: ["loc", "npc", "if", "spotanim"] },
+  { regex: /\w*anim\w*/, params: [param('seq')], fileTypes: ["loc", "npc", "if", "if3", "spotanim"] },
   { regex: /multiloc\d+/, params: [param('loc')], fileTypes: ["loc"] },
   { regex: /multinpc\d+/, params: [param('npc')], fileTypes: ["npc"]},
   { regex: /basevar/, params: [param('varp')], fileTypes: ["varbit"] },
   { regex: /basevar/, params: [param('varn')], fileTypes: ["varnbit"] },
-  { regex: /script\d+op\d+=pushvar,/, params: [param('varp')], fileTypes: ["if"] },
-  { regex: /layer/, params: [param('component')], fileTypes: ["if"] }
+  { regex: /script\d+op\d+=pushvar,/, params: [param('varp')], fileTypes: ["if", "if3"] },
+  { regex: /layer/, params: [param('component')], fileTypes: ["if", "if3"] }
 ]
 
 // === CONFIG KEYS THAT ARE HANDLED MANUALLY IN CONFIG_MATCHER ===
 const specialCaseKeys = ['val', 'param', 'data', ''];
 
 const specialCaseKeysRegex = [
-  {regex: /script\d+op\d/, fileTypes: ["if"]}
+  {regex: /script\d+op\d/, fileTypes: ["if", "if3"]}
 ]
 
 function param(type, declaration = false) {
