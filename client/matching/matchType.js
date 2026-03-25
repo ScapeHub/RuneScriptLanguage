@@ -100,12 +100,12 @@ const matchType = {
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO, CODEBLOCK], [LANGUAGE]: 'dbtableconfig'},
   },
   INTERFACE: {
-    id: 'INTERFACE', types: ['interface'], fileTypes: ['if'], cache: true, allowRename: true, referenceOnly: true,
+    id: 'INTERFACE', types: ['interface'], fileTypes: ['if', 'if3'], cache: true, allowRename: true, referenceOnly: true,
     hoverConfig: {[REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'interface'},
     postProcessor: fileNamePostProcessor
   },
   COMPONENT: {
-    id: 'COMPONENT', types: ['component'], fileTypes: ['if'], cache: true, allowRename: true, 
+    id: 'COMPONENT', types: ['component'], fileTypes: ['if', 'if3'], cache: true, allowRename: true, 
     hoverConfig: {[DECLARATION_HOVER_ITEMS]: [TITLE, INFO], [REFERENCE_HOVER_ITEMS]: [TITLE, INFO], [LANGUAGE]: 'interface'},
     postProcessor: componentPostProcessor
   },

@@ -90,7 +90,9 @@ const renameProvider = {
 
             // rename interface file(s)
             const ifFiles = await vscode.workspace.findFiles('**/*.if');
-            for (const uri of ifFiles) {
+            const if3Files = await vscode.workspace.findFiles('**/*.if3');
+            const allIfFiles = [...ifFiles, ...if3Files];
+            for (const uri of allIfFiles) {
                 const filename = path.parse(uri.fsPath).name;
                 if (filename !== word) continue;
 

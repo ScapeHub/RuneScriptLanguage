@@ -38,6 +38,7 @@ function declarationMatcher(context) {
     case "idk": return declaration(matchType.IDK);
     case "mesanim": return declaration(matchType.MESANIM);
     case "if": return declaration(matchType.COMPONENT)
+    case "if3": return declaration(matchType.COMPONENT)
   }
 }
 

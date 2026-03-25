@@ -16,7 +16,7 @@ const configKeyInfo = expandInfo({
   val: { 'enum': 'A data value for the enum in the format "inputData,outputData"' },
   scope: { 'varp': 'The lifetime of a player variable\n\nBy default it is temporary and reset on logout/login. You can make it persist by setting scope=perm' },
   protect: { 'varp': 'If the player variable should require protected access\n\nDefault value <b>true</b> (acceptable values: true/yes, false/no)\n\nProtected means a script can not <b>write</b> to it without sole access, but a varp can always be <b>read</b> regardless of the protection.' },
-  clientcode: { 'varp, if': 'Ties this to specific client-side code logic\n\nAcceptable value defined in client source, if you actually need this you should already know what to put.' },
+  clientcode: { 'varp, if, if3': 'Ties this to specific client-side code logic\n\nAcceptable value defined in client source, if you actually need this you should already know what to put.' },
   transmit: { 'varp': 'If a player variable should be transmitted to the client\n\nDefault value <b>false</b> (acceptable values: true/yes, false/no)\n\nThe main use for this property is in conjunction with interfaces.' },
   stock: { 'inv': 'Stock of an item in a shop, format "object,stock,restock_ticks"'},
   count: { 'obj': 'Object to use when the based on the stack size of an item' },

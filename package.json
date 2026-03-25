@@ -4,7 +4,7 @@
     "publisher": "scaperune",
     "repository": "https://github.com/ScapeHub/RuneScriptLanguage",
     "description": "Syntax highlighting for RuneScript.",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "icon": "icons/bob_the_cat.gif",
     "engines": {
         "vscode": "^1.75.0"
@@ -336,7 +336,8 @@
                     "Interface"
                 ],
                 "extensions": [
-                    ".if"
+                    ".if",
+                    ".if3"
                 ],
                 "configuration": "./language-configuration/confscript.language-configuration.json",
                 "icon": {
